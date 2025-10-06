@@ -3,3 +3,4 @@ test_main.http
 
 .env
 venv/
+postgres_data/
