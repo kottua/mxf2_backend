@@ -4,14 +4,12 @@ from typing import Optional, List
 from sqlalchemy import Integer, String, Float, Boolean, JSON, ForeignKey, DateTime, func
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from .base import Base
-from .mixins.timestamp_mixin import TimeStampMixin
+from app.infrastructure.postgres.models.base import Base
 
 
-class Premises(Base, TimeStampMixin):
+class Premises(Base):
     __tablename__ = "premises"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     reo_id: Mapped[int] = mapped_column(Integer, ForeignKey("real_estate_objects.id"), nullable=False)
     uploaded: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     property_type: Mapped[str] = mapped_column(String, nullable=False)

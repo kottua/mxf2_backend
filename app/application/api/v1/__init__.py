@@ -1,0 +1,21 @@
+from fastapi import APIRouter
+
+from app.application.api.v1.real_estate_objects import real_estate_objects_router
+from app.application.api.v1.pricing_configs import pricing_configs_router
+from app.application.api.v1.distribution_configs import router as distribution_configs_router
+from app.application.api.v1.premises import premises_router
+from app.application.api.v1.sales import sales_router
+from app.application.api.v1.committed_prices import router as committed_prices_router
+from app.application.api.v1.income_plans import router as income_plans_router
+from app.application.api.v1.status_mappings import status_mappings_router
+
+routers = APIRouter()
+
+routers.include_router(real_estate_objects_router, prefix="/real-estate-objects", tags=["Real Estate Objects"])
+routers.include_router(pricing_configs_router, prefix="/pricing-configs", tags=["Pricing Configs"])
+routers.include_router(distribution_configs_router, prefix="/distribution-configs", tags=["Distribution Configs"])
+routers.include_router(premises_router, prefix="/premises", tags=["Premises"])
+routers.include_router(sales_router, prefix="/sales", tags=["Sales"])
+routers.include_router(committed_prices_router, prefix="/committed-prices", tags=["Committed Prices"])
+routers.include_router(income_plans_router, prefix="/income-plans", tags=["Income Plans"])
+routers.include_router(status_mappings_router, prefix="/status-mappings", tags=["Status Mappings"])

@@ -1,23 +1,33 @@
-import logging
 
+import os
+
+import uvicorn
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from routes import router_v1
+from app.application.api import error_handlers
+from app.application.api.v1 import routers
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]
-)
-app = FastAPI(docs_url='/')
+from app.settings import settings
+from app.core import exceptions
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-app.include_router(router_v1.v1_router, prefix="/api/v1")
+def _include_router(app: FastAPI) -> None:
+    app.include_router(routers)
+
+
+def _include_error_handlers(app: FastAPI) -> None:
+    app.add_exception_handler(exceptions.ObjectAlreadyExists, error_handlers.handle_object_already_exists)
+    app.add_exception_handler(exceptions.ObjectNotFound, error_handlers.handle_object_not_found)
+
+
+def create_app() -> FastAPI:
+    app = FastAPI()
+    _include_router(app)
+    _include_error_handlers(app)
+
+    return app
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:create_app", host=settings.HOST, port=settings.PORT)

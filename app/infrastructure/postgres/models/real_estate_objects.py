@@ -3,14 +3,12 @@ from typing import Optional, List
 from sqlalchemy import Integer, String, Float, Boolean, JSON
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
-from .base import Base
-from .mixins.timestamp_mixin import TimeStampMixin
+from app.infrastructure.postgres.models.base import Base
 
 
-class RealEstateObject(Base, TimeStampMixin):
+class RealEstateObject(Base):
     __tablename__ = "real_estate_objects"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     lon: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)

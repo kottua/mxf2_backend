@@ -8,30 +8,6 @@ from database import get_db
 
 distribution_configs_router = APIRouter()
 
-class DistributionConfigCreate(BaseModel):
-    func_name: str
-    content: Dict
-    is_active: bool = False
-
-    class Config:
-        from_attributes = True
-
-class DistributionConfigUpdate(BaseModel):
-    func_name: Optional[str] = None
-    content: Optional[Dict] = None
-    is_active: Optional[bool] = None
-
-    class Config:
-        from_attributes = True
-
-class DistributionConfigResponse(BaseModel):
-    id: int
-    func_name: str
-    content: Dict
-    is_active: bool
-
-    class Config:
-        from_attributes = True
 
 @distribution_configs_router.post("/", response_model=DistributionConfigResponse)
 async def create_distribution_config(request: DistributionConfigCreate, db: AsyncSession = Depends(get_db)):
