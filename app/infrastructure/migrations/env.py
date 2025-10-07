@@ -1,4 +1,5 @@
 from logging.config import fileConfig
+from typing import Any
 
 from alembic import context
 from alembic.script import ScriptDirectory
@@ -28,7 +29,7 @@ target_metadata = Base.metadata
 
 
 # A helper function to set custom revision IDs
-def process_revision_directives(context, revision, directives):
+def process_revision_directives(context: Any, revision: Any, directives: Any) -> None:
     migration_script = directives[0]
     # Extract current head revision
     head_revision = ScriptDirectory.from_config(context.config).get_current_head()
@@ -46,7 +47,7 @@ def process_revision_directives(context, revision, directives):
 
 
 # Offline mode: no active database connection
-def run_migrations_offline():
+def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
@@ -61,7 +62,7 @@ def run_migrations_offline():
 
 
 # Online mode: active database connection
-async def run_migrations_online():
+async def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     engine = create_async_engine(config.get_main_option("sqlalchemy.url"))
 
@@ -72,7 +73,7 @@ async def run_migrations_online():
 
 
 # Synchronous wrapper for migrations
-def do_run_migrations(connection):
+def do_run_migrations(connection: Any) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,

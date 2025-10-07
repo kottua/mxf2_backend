@@ -16,7 +16,7 @@ class IncomePlanCreate(BaseModel):
     is_active: bool = True
 
     @field_validator("period_begin", "period_end", mode="before")
-    def validate_date_format(cls, value):
+    def validate_date_format(cls, value: str) -> str:
         try:
             datetime.strptime(value, "%d/%m/%Y")
             return value

@@ -1,6 +1,6 @@
 import contextlib
 from functools import wraps
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator, Callable
 
 from app.infrastructure.postgres.connection import AsyncSessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,7 +22,7 @@ async def create_async_session() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-def provide_async_session(func):
+def provide_async_session(func: Callable[..., Any]) -> Callable[..., Any]:
     """
     Function decorator that provides an async session if it isn't provided.
     If you want to reuse a session or run the function as part of a
@@ -31,7 +31,7 @@ def provide_async_session(func):
     """
 
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args: Any, **kwargs: Any) -> Any:
         arg_session = "session"
 
         func_params = func.__code__.co_varnames

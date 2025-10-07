@@ -13,7 +13,7 @@ def create_token(payload: Dict, token_type: TokenType, expire_minutes: int) -> s
     return jwt.encode(to_encode, settings.token.SECRET_KEY, algorithm=settings.token.ALGORITHM)
 
 
-def decode_token(token: str, key: str, options: dict, algorithms: list[str] = None) -> Dict:
+def decode_token(token: str, key: str, options: dict, algorithms: list[str] | None = None) -> Dict:
     try:
         payload = jwt.decode(jwt=token, key=key, algorithms=algorithms, options=options)
         return payload

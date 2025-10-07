@@ -51,7 +51,7 @@ class PremisesRepository(PremisesRepositoryInterface):
         return created_premises
 
     @provide_async_session
-    async def create_bulk_premises(self, data: list[dict], reo_id: id, session: AsyncSession) -> Sequence[Premises]:
+    async def create_bulk_premises(self, data: list[dict], reo_id: int, session: AsyncSession) -> Sequence[Premises]:
         stmt = insert(Premises)
         await session.execute(stmt, data)
         await session.commit()

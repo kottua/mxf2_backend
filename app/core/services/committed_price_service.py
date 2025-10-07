@@ -25,7 +25,7 @@ class CommittedPricesService:
         committed_price = await self.repository.create(data.model_dump())
         return CommittedPricesResponse.model_validate(committed_price)
 
-    async def get_committed_price(self, id: int) -> CommittedPricesResponse | None:
+    async def get_committed_price(self, id: int) -> CommittedPricesResponse:
         committed_price = await self.repository.get(id=id)
         if not committed_price:
             raise ObjectNotFound(model_name="CommittedPrices", id_=id)

@@ -22,7 +22,7 @@ class IncomePlanRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, plan: Any, data: IncomePlanUpdate):
+    async def update(self, plan: Any, data: IncomePlanUpdate) -> IncomePlanResponse:
         """Update an existing income plan."""
         raise NotImplementedError
 
@@ -37,6 +37,6 @@ class IncomePlanRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def deactivate_active_plans(self, reo_id: int):
+    async def deactivate_active_plans(self, reo_id: int) -> None:
         """Deactivate all active income plans."""
         raise NotImplementedError

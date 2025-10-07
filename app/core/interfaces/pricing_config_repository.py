@@ -27,7 +27,7 @@ class PricingConfigRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, pricing_config: Any, data: PricingConfigUpdate):
+    async def update(self, pricing_config: Any, data: PricingConfigUpdate) -> Any:
         """Update an existing pricing config."""
         raise NotImplementedError
 
@@ -37,6 +37,6 @@ class PricingConfigRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def deactivate_active_pricing_configs(self, reo_id: int):
+    async def deactivate_active_pricing_configs(self, reo_id: int) -> None:
         """Deactivate all active income plans."""
         raise NotImplementedError

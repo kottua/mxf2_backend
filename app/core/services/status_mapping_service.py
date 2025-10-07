@@ -12,8 +12,10 @@ class StatusMappingService:
         status_mapping = await self.repository.create(data.model_dump())
         return StatusMappingResponse.model_validate(status_mapping)
 
-    async def get(self, id: int) -> StatusMappingResponse | None:
+    async def get(self, id: int) -> StatusMappingResponse:
         status_mapping = await self.repository.get(id)
+        if not status_mapping:
+            raise ObjectNotFound(model_name="StatusMapping", id_=id)
         return StatusMappingResponse.model_validate(status_mapping)
 
     async def get_all(self) -> list[StatusMappingResponse]:

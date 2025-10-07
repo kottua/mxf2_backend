@@ -27,7 +27,7 @@ class RealEstateObjectRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, reo: Any, data: RealEstateObjectUpdate):
+    async def update(self, reo: Any, data: RealEstateObjectUpdate) -> RealEstateObjectResponse:
         """Update an existing income plan."""
         raise NotImplementedError
 
