@@ -1,15 +1,9 @@
-
-import os
-
 import uvicorn
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-
 from app.application.api import error_handlers
 from app.application.api.v1 import routers
-
-from app.settings import settings
 from app.core import exceptions
+from app.settings import settings
+from fastapi import FastAPI
 
 
 def _include_router(app: FastAPI) -> None:

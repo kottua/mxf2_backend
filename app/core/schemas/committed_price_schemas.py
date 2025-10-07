@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import List, Dict
 from datetime import datetime
+from typing import Dict
+
+from pydantic import BaseModel, Field
 
 
 class CommittedPricesCreate(BaseModel):
@@ -14,6 +15,7 @@ class CommittedPricesCreate(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class CommittedPricesResponse(BaseModel):
     id: int

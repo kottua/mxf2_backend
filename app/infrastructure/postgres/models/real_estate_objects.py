@@ -1,9 +1,8 @@
-from typing import Optional, List
-
-from sqlalchemy import Integer, String, Float, Boolean, JSON
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from typing import List, Optional
 
 from app.infrastructure.postgres.models.base import Base
+from sqlalchemy import JSON, Boolean, Float, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class RealEstateObject(Base):
@@ -24,7 +23,4 @@ class RealEstateObject(Base):
     income_plans: Mapped[List["IncomePlan"]] = relationship(back_populates="real_estate_object")
     status_mappings: Mapped[List["StatusMapping"]] = relationship(back_populates="real_estate_object")
 
-    __table_args__ = {
-        "sqlite_autoincrement": True,
-        "extend_existing": True
-    }
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
 from app.core.schemas.income_plan_schemas import IncomePlanResponse
 from app.core.schemas.premise_schemas import PremisesResponse
 from app.core.schemas.pricing_config_schemas import PricingConfigResponse
+from pydantic import BaseModel, Field
 
 
 class RealEstateObjectCreate(BaseModel):
@@ -18,6 +18,7 @@ class RealEstateObjectCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class RealEstateObjectUpdate(BaseModel):
     name: Optional[str] = None
     lon: Optional[float] = Field(None, ge=-180, le=180)
@@ -29,6 +30,7 @@ class RealEstateObjectUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class RealEstateObjectResponse(BaseModel):
     id: int
@@ -44,6 +46,7 @@ class RealEstateObjectResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class RealEstateObjectFullResponse(BaseModel):
     id: int
@@ -63,4 +66,3 @@ class RealEstateObjectFullResponse(BaseModel):
 
     class Config:
         from_attributes = True
-

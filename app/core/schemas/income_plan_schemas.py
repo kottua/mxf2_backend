@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class IncomePlanCreate(BaseModel):
@@ -25,6 +26,7 @@ class IncomePlanCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class IncomePlanUpdate(BaseModel):
     reo_id: Optional[int] = None
     property_type: Optional[str] = None
@@ -39,6 +41,7 @@ class IncomePlanUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class IncomePlanResponse(BaseModel):
     id: int

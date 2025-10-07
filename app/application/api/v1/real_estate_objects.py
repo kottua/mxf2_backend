@@ -1,80 +1,44 @@
-from fastapi import APIRouter, HTTPException, Depends
-# from sqlalchemy.ext.asyncio import AsyncSession
-# from sqlalchemy import select, update
-# from pydantic import BaseModel, Field
-# from typing import Optional, List, Dict
-# from datetime import datetime
-#
-# from sqlalchemy.orm import selectinload
-#
-# from database.models import RealEstateObject
-# from database import get_db
-# from routes.v1.income_plans import IncomePlanResponse
-# from routes.v1.premises import PremisesResponse
-# from routes.v1.pricing_configs import PricingConfigResponse
-#
-real_estate_objects_router = APIRouter()
-#
-# @real_estate_objects_router.post("/", response_model=RealEstateObjectResponse)
-# async def create_real_estate_object(request: RealEstateObjectCreate, db: AsyncSession = Depends(get_db)):
-#     try:
-#         reo = RealEstateObject(
-#             name=request.name,
-#             lon=request.lon,
-#             lat=request.lat,
-#             curr=request.curr,
-#             url=request.url,
-#             custom_fields=request.custom_fields,
-#             is_deleted=False
-#         )
-#         db.add(reo)
-#         await db.commit()
-#         await db.refresh(reo)
-#         return RealEstateObjectResponse.from_orm(reo)
-#     except Exception as e:
-#         await db.rollback()
-#         raise HTTPException(status_code=400, detail=str(e))
-#
-# @real_estate_objects_router.get("/{id}", response_model=RealEstateObjectFullResponse)
-# async def get_real_estate_object(id: int, db: AsyncSession = Depends(get_db)):
-#     reo = await db.get(
-#         RealEstateObject,
-#         id,
-#         options=[
-#             selectinload(RealEstateObject.premises),
-#             selectinload(RealEstateObject.income_plans),
-#             selectinload(RealEstateObject.pricing_configs)
-#         ]
-#     )
-#     if not reo:
-#         raise HTTPException(status_code=404, detail="RealEstateObject not found")
-#     response = RealEstateObjectFullResponse.model_validate(reo)
-#
-#     return response
-#
-# @real_estate_objects_router.get("/", response_model=List[RealEstateObjectResponse])
-# async def get_all_real_estate_objects(db: AsyncSession = Depends(get_db)):
-#     result = await db.execute(select(RealEstateObject).filter_by(is_deleted=False))
-#     reos = result.scalars().all()
-#     return [RealEstateObjectResponse.model_validate(reo) for reo in reos]
-#
-# @real_estate_objects_router.put("/{id}", response_model=RealEstateObjectResponse)
-# async def update_real_estate_object(id: int, request: RealEstateObjectUpdate, db: AsyncSession = Depends(get_db)):
-#     reo = await db.get(RealEstateObject, id)
-#     if not reo:
-#         raise HTTPException(status_code=404, detail="RealEstateObject not found")
-#     update_data = request.dict(exclude_unset=True)
-#     for key, value in update_data.items():
-#         setattr(reo, key, value)
-#     await db.commit()
-#     await db.refresh(reo)
-#     return RealEstateObjectResponse.from_orm(reo)
-#
-# @real_estate_objects_router.delete("/{id}", response_model=bool)
-# async def delete_real_estate_object(id: int, db: AsyncSession = Depends(get_db)):
-#     reo = await db.get(RealEstateObject, id)
-#     if not reo:
-#         raise HTTPException(status_code=404, detail="RealEstateObject not found")
-#     reo.is_deleted = True
-#     await db.commit()
-#     return True
+from app.application.api.depends import real_estate_object_service_deps
+from app.core.schemas.real_estate_object_schemas import (
+    RealEstateObjectCreate,
+    RealEstateObjectFullResponse,
+    RealEstateObjectResponse,
+    RealEstateObjectUpdate,
+)
+from fastapi import APIRouter
+from starlette import status
+
+router = APIRouter()
+
+
+@router.post("/", response_model=RealEstateObjectResponse)
+async def create_real_estate_object(
+    request: RealEstateObjectCreate, real_estate_object_service: real_estate_object_service_deps
+):
+    reo = await real_estate_object_service.create(request=request)
+    return reo
+
+
+@router.get("/{id}", response_model=RealEstateObjectFullResponse)
+async def get_real_estate_object(id: int, real_estate_object_service: real_estate_object_service_deps):
+    reo = await real_estate_object_service.get_full(id=id)
+    return reo
+
+
+@router.get("/", response_model=list[RealEstateObjectResponse])
+async def get_all_real_estate_objects(real_estate_object_service: real_estate_object_service_deps):
+    reos = await real_estate_object_service.get_all()
+    return reos
+
+
+@router.put("/{id}", response_model=RealEstateObjectResponse)
+async def update_real_estate_object(
+    id: int, request: RealEstateObjectUpdate, real_estate_object_service: real_estate_object_service_deps
+):
+    reo = await real_estate_object_service.update(id=id, request=request)
+    return reo
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_real_estate_object(id: int, real_estate_object_service: real_estate_object_service_deps):
+    await real_estate_object_service.delete(id=id)

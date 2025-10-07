@@ -2,10 +2,9 @@ from logging.config import fileConfig
 
 from alembic import context
 from alembic.script import ScriptDirectory
-from sqlalchemy.ext.asyncio import create_async_engine
-
 from app.infrastructure.postgres.models.base import Base
 from app.settings import settings
+from sqlalchemy.ext.asyncio import create_async_engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

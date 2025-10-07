@@ -2,9 +2,8 @@ import contextlib
 from functools import wraps
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.infrastructure.postgres.connection import AsyncSessionLocal
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @contextlib.asynccontextmanager

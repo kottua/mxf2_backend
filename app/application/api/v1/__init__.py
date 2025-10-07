@@ -1,13 +1,12 @@
-from fastapi import APIRouter
-
-from app.application.api.v1.real_estate_objects import real_estate_objects_router
-from app.application.api.v1.pricing_configs import pricing_configs_router
-from app.application.api.v1.distribution_configs import router as distribution_configs_router
-from app.application.api.v1.premises import premises_router
-from app.application.api.v1.sales import sales_router
 from app.application.api.v1.committed_prices import router as committed_prices_router
+from app.application.api.v1.distribution_configs import router as distribution_configs_router
 from app.application.api.v1.income_plans import router as income_plans_router
-from app.application.api.v1.status_mappings import status_mappings_router
+from app.application.api.v1.premises import router as premises_router
+from app.application.api.v1.pricing_configs import router as pricing_configs_router
+from app.application.api.v1.real_estate_objects import router as real_estate_objects_router
+from app.application.api.v1.sales import router as sales_router
+from app.application.api.v1.status_mappings import router as status_mappings_router
+from fastapi import APIRouter
 
 routers = APIRouter()
 

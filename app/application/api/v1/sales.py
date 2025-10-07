@@ -1,56 +1,35 @@
-from fastapi import APIRouter, HTTPException, Depends
-# from sqlalchemy.ext.asyncio import AsyncSession
-# from sqlalchemy import select, update
-# from pydantic import BaseModel, Field
-# from typing import Optional, List
-# from datetime import datetime
-# from database.models import Sales
-# from database import get_db
-#
-sales_router = APIRouter()
-#
-# @sales_router.post("/", response_model=SalesResponse)
-# async def create_sale(request: SalesCreate, db: AsyncSession = Depends(get_db)):
-#     try:
-#         sale = Sales(**request.dict())
-#         db.add(sale)
-#         await db.commit()
-#         await db.refresh(sale)
-#         return SalesResponse.from_orm(sale)
-#     except Exception as e:
-#         await db.rollback()
-#         raise HTTPException(status_code=400, detail=str(e))
-#
-# @sales_router.get("/{id}", response_model=SalesResponse)
-# async def get_sale(id: int, db: AsyncSession = Depends(get_db)):
-#     sale = await db.get(Sales, id)
-#     if not sale:
-#         raise HTTPException(status_code=404, detail="Sale not found")
-#     return SalesResponse.from_orm(sale)
-#
-# @sales_router.get("/", response_model=List[SalesResponse])
-# async def get_all_sales(db: AsyncSession = Depends(get_db)):
-#     result = await db.execute(select(Sales).filter_by(is_deleted=False))
-#     sales = result.scalars().all()
-#     return [SalesResponse.from_orm(sale) for sale in sales]
-#
-# @sales_router.put("/{id}", response_model=SalesResponse)
-# async def update_sale(id: int, request: SalesUpdate, db: AsyncSession = Depends(get_db)):
-#     sale = await db.get(Sales, id)
-#     if not sale:
-#         raise HTTPException(status_code=404, detail="Sale not found")
-#     update_data = request.dict(exclude_unset=True)
-#     for key, value in update_data.items():
-#         setattr(sale, key, value)
-#     await db.commit()
-#     await db.refresh(sale)
-#     return SalesResponse.from_orm(sale)
-#
-# @sales_router.delete("/{id}", response_model=bool)
-# async def delete_sale(id: int, db: AsyncSession = Depends(get_db)):
-#     sale = await db.get(Sales, id)
-#     if not sale:
-#         raise HTTPException(status_code=404, detail="Sale not found")
-#     sale.is_deleted = True
-#     await db.commit()
-#     return True
+from app.application.api.depends import sales_service_deps
+from app.core.schemas.sale_schemas import SalesCreate, SalesResponse, SalesUpdate
+from fastapi import APIRouter
+from starlette import status
+
+router = APIRouter()
+
+
+@router.post("/", response_model=SalesResponse)
+async def create_sale(request: SalesCreate, sales_service: sales_service_deps):
+    sale = await sales_service.create(request)
+    return sale
+
+
+@router.get("/{id}", response_model=SalesResponse)
+async def get_sale(id: int, sales_service: sales_service_deps):
+    sale = await sales_service.get(id)
+    return sale
+
+
+@router.get("/", response_model=list[SalesResponse])
+async def get_all_sales(sales_service: sales_service_deps):
+    sales = await sales_service.get_all()
+    return sales
+
+
+@router.put("/{id}", response_model=SalesResponse)
+async def update_sale(id: int, request: SalesUpdate, sales_service: sales_service_deps):
+    sale = await sales_service.update(id, request)
+    return sale
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_sale(id: int, sales_service: sales_service_deps):
+    await sales_service.delete(id)

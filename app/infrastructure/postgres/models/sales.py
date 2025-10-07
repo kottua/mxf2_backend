@@ -1,10 +1,9 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Integer, Float, Boolean, ForeignKey, DateTime
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-
 from app.infrastructure.postgres.models.base import Base
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class Sales(Base):
@@ -19,7 +18,4 @@ class Sales(Base):
     # Relationships
     premises: Mapped["Premises"] = relationship(back_populates="sales")
 
-    __table_args__ = {
-        "sqlite_autoincrement": True,
-        "extend_existing": True
-    }
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import Integer, String, Boolean, DateTime, func, ForeignKey, Float
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-
 from app.infrastructure.postgres.models.base import Base
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 class IncomePlan(Base):
     __tablename__ = "income_plans"
@@ -23,7 +23,4 @@ class IncomePlan(Base):
     # Relationships
     real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="income_plans")
 
-    __table_args__ = {
-        "sqlite_autoincrement": True,
-        "extend_existing": True
-    }
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

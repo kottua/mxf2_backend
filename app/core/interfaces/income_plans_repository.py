@@ -1,5 +1,5 @@
-from typing import Any
 from abc import ABC, abstractmethod
+from typing import Any
 
 from app.core.schemas.income_plan_schemas import BulkIncomePlanCreate, IncomePlanResponse, IncomePlanUpdate
 
@@ -29,11 +29,6 @@ class IncomePlanRepositoryInterface(ABC):
     @abstractmethod
     async def delete(self, plan: Any) -> None:
         """Delete an income plan."""
-        raise NotImplementedError
-
-    @abstractmethod
-    async def get_reo(self, reo_id: int) -> Any:
-        """Retrieve an REO by its ID."""
         raise NotImplementedError
 
     @abstractmethod

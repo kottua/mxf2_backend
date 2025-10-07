@@ -1,46 +1,37 @@
-from fastapi import APIRouter, HTTPException, Depends
-# from sqlalchemy.ext.asyncio import AsyncSession
-# from sqlalchemy import select, update
-# from pydantic import BaseModel
-# from typing import Optional, List
-# from database.models import StatusMapping
-# from database import get_db
-#
-status_mappings_router = APIRouter()
-#
-# @status_mappings_router.post("/", response_model=StatusMappingResponse)
-# async def create_status_mapping(request: StatusMappingCreate, db: AsyncSession = Depends(get_db)):
-#     try:
-#         mapping = StatusMapping(**request.dict())
-#         db.add(mapping)
-#         await db.commit()
-#         await db.refresh(mapping)
-#         return StatusMappingResponse.from_orm(mapping)
-#     except Exception as e:
-#         await db.rollback()
-#         raise HTTPException(status_code=400, detail=str(e))
-#
-# @status_mappings_router.get("/{id}", response_model=StatusMappingResponse)
-# async def get_status_mapping(id: int, db: AsyncSession = Depends(get_db)):
-#     mapping = await db.get(StatusMapping, id)
-#     if not mapping:
-#         raise HTTPException(status_code=404, detail="StatusMapping not found")
-#     return StatusMappingResponse.from_orm(mapping)
-#
-# @status_mappings_router.get("/", response_model=List[StatusMappingResponse])
-# async def get_all_status_mappings(db: AsyncSession = Depends(get_db)):
-#     result = await db.execute(select(StatusMapping))
-#     mappings = result.scalars().all()
-#     return [StatusMappingResponse.from_orm(mapping) for mapping in mappings]
-#
-# @status_mappings_router.put("/{id}", response_model=StatusMappingResponse)
-# async def update_status_mapping(id: int, request: StatusMappingUpdate, db: AsyncSession = Depends(get_db)):
-#     mapping = await db.get(StatusMapping, id)
-#     if not mapping:
-#         raise HTTPException(status_code=404, detail="StatusMapping not found")
-#     update_data = request.dict(exclude_unset=True)
-#     for key, value in update_data.items():
-#         setattr(mapping, key, value)
-#     await db.commit()
-#     await db.refresh(mapping)
-#     return StatusMappingResponse.from_orm(mapping)
+from app.application.api.depends import status_mapping_service_deps
+from app.core.schemas.status_mapping_schemas import StatusMappingCreate, StatusMappingResponse, StatusMappingUpdate
+from fastapi import APIRouter
+from starlette import status
+
+router = APIRouter()
+
+
+@router.post("/", response_model=StatusMappingResponse)
+async def create_status_mapping(request: StatusMappingCreate, status_mapping_service: status_mapping_service_deps):
+    status_mapping = await status_mapping_service.create(data=request)
+    return status_mapping
+
+
+@router.get("/{id}", response_model=StatusMappingResponse)
+async def get_status_mapping(id: int, status_mapping_service: status_mapping_service_deps):
+    status_mapping = await status_mapping_service.get(id=id)
+    return status_mapping
+
+
+@router.get("/", response_model=list[StatusMappingResponse])
+async def get_all_status_mappings(status_mapping_service: status_mapping_service_deps):
+    status_mappings = await status_mapping_service.get_all()
+    return status_mappings
+
+
+@router.put("/{id}", response_model=StatusMappingResponse)
+async def update_status_mapping(
+    id: int, request: StatusMappingUpdate, status_mapping_service: status_mapping_service_deps
+):
+    status_mapping = await status_mapping_service.update(id=id, data=request)
+    return status_mapping
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_status_mapping(id: int, status_mapping_service: status_mapping_service_deps):
+    await status_mapping_service.delete(id=id)

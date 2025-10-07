@@ -1,13 +1,15 @@
 from app.core.exceptions import ObjectNotFound
 from app.core.interfaces.distribution_configs_repository import DistributionConfigsRepositoryInterface
-from app.core.schemas.distribution_config_schemas import DistributionConfigResponse, DistributionConfigUpdate, \
-    DistributionConfigCreate
+from app.core.schemas.distribution_config_schemas import (
+    DistributionConfigCreate,
+    DistributionConfigResponse,
+    DistributionConfigUpdate,
+)
 
 
 class DistributionConfigsService:
     def __init__(self, repository: DistributionConfigsRepositoryInterface):
         self.repository = repository
-
 
     async def create(self, data: DistributionConfigCreate) -> DistributionConfigResponse:
         distribution_config = await self.repository.create(data.model_dump())

@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel
 
 
 class PricingConfigCreate(BaseModel):
@@ -11,12 +12,14 @@ class PricingConfigCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class PricingConfigUpdate(BaseModel):
     is_active: Optional[bool] = None
     content: Optional[dict] = None
 
     class Config:
         from_attributes = True
+
 
 class PricingConfigResponse(BaseModel):
     id: int

@@ -1,9 +1,7 @@
+from datetime import datetime
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
-from datetime import datetime
-
-
 
 
 class PremisesCreate(BaseModel):
@@ -37,6 +35,7 @@ class PremisesCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class PremisesUpdate(BaseModel):
     property_type: Optional[str] = None
     premises_id: Optional[str] = None
@@ -66,6 +65,7 @@ class PremisesUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class PremisesResponse(BaseModel):
     id: int
@@ -99,6 +99,7 @@ class PremisesResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class BulkPremisesCreateRequest(BaseModel):
     premises: List[PremisesCreate]

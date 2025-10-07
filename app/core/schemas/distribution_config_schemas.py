@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class DistributionConfigCreate(BaseModel):
@@ -10,6 +11,7 @@ class DistributionConfigCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class DistributionConfigUpdate(BaseModel):
     func_name: Optional[str] = None
     content: Optional[dict] = None
@@ -17,6 +19,7 @@ class DistributionConfigUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class DistributionConfigResponse(BaseModel):
     id: int

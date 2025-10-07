@@ -1,8 +1,6 @@
-
-from sqlalchemy import Integer, Boolean, JSON, ForeignKey, Float
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-
 from app.infrastructure.postgres.models.base import Base
+from sqlalchemy import JSON, Boolean, Float, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class CommittedPrices(Base):
@@ -21,7 +19,4 @@ class CommittedPrices(Base):
     pricing_config: Mapped["PricingConfig"] = relationship(back_populates="committed_prices")
     distribution_config: Mapped["DistributionConfig"] = relationship(back_populates="committed_prices")
 
-    __table_args__ = {
-        "sqlite_autoincrement": True,
-        "extend_existing": True
-    }
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

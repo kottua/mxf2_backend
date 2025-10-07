@@ -1,7 +1,6 @@
+from app.core import exceptions
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
-from app.core import exceptions
-
 
 
 def handle_object_not_found(_: Request, e: exceptions.ObjectNotFound) -> JSONResponse:
@@ -10,4 +9,3 @@ def handle_object_not_found(_: Request, e: exceptions.ObjectNotFound) -> JSONRes
 
 def handle_object_already_exists(_: Request, e: exceptions.ObjectAlreadyExists) -> JSONResponse:
     return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_409_CONFLICT)
-

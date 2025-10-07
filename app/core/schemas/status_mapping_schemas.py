@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class StatusMappingCreate(BaseModel):
@@ -10,6 +11,7 @@ class StatusMappingCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class StatusMappingUpdate(BaseModel):
     reo_id: Optional[int] = None
     dev_status: Optional[str] = None
@@ -17,6 +19,7 @@ class StatusMappingUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class StatusMappingResponse(BaseModel):
     id: int

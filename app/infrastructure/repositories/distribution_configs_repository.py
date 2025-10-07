@@ -1,18 +1,17 @@
 from typing import Sequence
 
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.core.interfaces.distribution_configs_repository import DistributionConfigsRepositoryInterface
 from app.infrastructure.postgres.models import DistributionConfig
 from app.infrastructure.postgres.session_manager import provide_async_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class DistributionConfigsRepository(DistributionConfigsRepositoryInterface):
 
     @provide_async_session
     async def create(self, data: dict, session: AsyncSession) -> DistributionConfig:
-        config = DistributionConfig(**data )
+        config = DistributionConfig(**data)
         session.add(config)
         await session.commit()
         await session.refresh(config)

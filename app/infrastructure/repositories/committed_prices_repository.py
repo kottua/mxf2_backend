@@ -1,9 +1,10 @@
-from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Sequence
+
 from app.core.interfaces.committed_prices_repository import CommittedPricesRepositoryInterface
 from app.infrastructure.postgres.models import CommittedPrices, DistributionConfig, PricingConfig, RealEstateObject
 from app.infrastructure.postgres.session_manager import provide_async_session
+from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CommittedPricesRepository(CommittedPricesRepositoryInterface):
@@ -30,30 +31,21 @@ class CommittedPricesRepository(CommittedPricesRepositoryInterface):
     async def deactivate_active_prices(self, reo_id: int, session: AsyncSession) -> None:
         await session.execute(
             update(CommittedPrices)
-            .where(
-                CommittedPrices.reo_id == reo_id,
-                CommittedPrices.is_active == True
-            )
+            .where(CommittedPrices.reo_id == reo_id, CommittedPrices.is_active == True)
             .values(is_active=False)
         )
 
     @provide_async_session
     async def exists_distribution_config(self, config_id: int, session: AsyncSession) -> bool:
-        result = await session.execute(
-            select(DistributionConfig.id).where(DistributionConfig.id == config_id)
-        )
+        result = await session.execute(select(DistributionConfig.id).where(DistributionConfig.id == config_id))
         return result.scalar_one_or_none() is not None
 
     @provide_async_session
     async def exists_pricing_config(self, config_id: int, session: AsyncSession) -> bool:
-        result = await session.execute(
-            select(PricingConfig.id).where(DistributionConfig.id == config_id)
-        )
+        result = await session.execute(select(PricingConfig.id).where(DistributionConfig.id == config_id))
         return result.scalar_one_or_none() is not None
 
     @provide_async_session
     async def exists_reo_id(self, reo_id: int, session: AsyncSession) -> bool:
-        result = await session.execute(
-            select(RealEstateObject.id).where(DistributionConfig.id == reo_id)
-        )
+        result = await session.execute(select(RealEstateObject.id).where(DistributionConfig.id == reo_id))
         return result.scalar_one_or_none() is not None

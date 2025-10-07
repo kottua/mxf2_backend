@@ -1,4 +1,4 @@
-from app.core.schemas.committed_price_schemas import CommittedPricesResponse, CommittedPricesCreate
+from app.core.schemas.committed_price_schemas import CommittedPricesCreate, CommittedPricesResponse
 
 __all__ = [
     "CommittedPricesResponse",

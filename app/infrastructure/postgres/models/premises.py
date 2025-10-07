@@ -1,10 +1,9 @@
 from datetime import datetime
-from typing import Optional, List
-
-from sqlalchemy import Integer, String, Float, Boolean, JSON, ForeignKey, DateTime, func
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from typing import List, Optional
 
 from app.infrastructure.postgres.models.base import Base
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class Premises(Base):
@@ -42,7 +41,4 @@ class Premises(Base):
     real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="premises")
     sales: Mapped[List["Sales"]] = relationship(back_populates="premises")
 
-    __table_args__ = {
-        "sqlite_autoincrement": True,
-        "extend_existing": True
-    }
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

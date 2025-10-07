@@ -1,5 +1,5 @@
-from typing import Any
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class DistributionConfigsRepositoryInterface(ABC):
@@ -27,5 +27,3 @@ class DistributionConfigsRepositoryInterface(ABC):
     async def get_all(self) -> list[dict]:
         """Retrieve all distribution configurations with pagination."""
         raise NotImplementedError
-
-

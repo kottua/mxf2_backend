@@ -7,7 +7,6 @@ from app.infrastructure.postgres.models.real_estate_objects import RealEstateObj
 from app.infrastructure.postgres.models.sales import Sales
 from app.infrastructure.postgres.models.status_mappings import StatusMapping
 
-
 __all__ = [
     "CommittedPrices",
     "DistributionConfig",
@@ -18,5 +17,3 @@ __all__ = [
     "Sales",
     "StatusMapping",
 ]
-
-

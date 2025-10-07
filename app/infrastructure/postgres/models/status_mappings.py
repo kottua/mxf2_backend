@@ -1,6 +1,6 @@
-from sqlalchemy import Integer, String, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.infrastructure.postgres.models.base import Base
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class StatusMapping(Base):
@@ -13,7 +13,4 @@ class StatusMapping(Base):
     # Relationships
     real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="status_mappings")
 
-    __table_args__ = {
-        "sqlite_autoincrement": True,
-        "extend_existing": True
-    }
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

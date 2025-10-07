@@ -1,4 +1,3 @@
-
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,7 +10,6 @@ class DatabaseSettings(BaseSettings):
     POSTGRES_PORT: int = Field(default=5432, alias="POSTGRES_PORT")
     POSTGRES_DB: str = Field(..., alias="POSTGRES_DB")
 
-
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @property
@@ -20,6 +18,7 @@ class DatabaseSettings(BaseSettings):
             f"{self.POSTGRES_DRIVER}://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
             f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
+
 
 class Settings(BaseSettings):
     HOST: str = Field(default="localhost", alias="HOST")

@@ -1,9 +1,8 @@
-from fastapi import APIRouter
-
 from typing import List
 
 from app.application.api.depends import committed_service_deps
 from app.core.schemas.committed_price_schemas import CommittedPricesCreate, CommittedPricesResponse
+from fastapi import APIRouter
 
 router = APIRouter()
 

@@ -1,11 +1,13 @@
-from app.core.exceptions import ValidationException, ObjectNotFound
+from app.core.exceptions import ObjectNotFound, ValidationException
 from app.core.interfaces.income_plans_repository import IncomePlanRepositoryInterface
-from app.core.schemas.income_plan_schemas import BulkIncomePlanCreate, IncomePlanResponse, IncomePlanCreate
+from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
+from app.core.schemas.income_plan_schemas import BulkIncomePlanCreate, IncomePlanCreate, IncomePlanResponse
 
 
 class IncomePlanService:
-    def __init__(self, repository: IncomePlanRepositoryInterface):
+    def __init__(self, repository: IncomePlanRepositoryInterface, reo_repository: RealEstateObjectRepositoryInterface):
         self.repository = repository
+        self.reo_repository = reo_repository
 
     async def create_bulk_income_plans(self, request: BulkIncomePlanCreate) -> list[IncomePlanResponse]:
         active_plans = [plan for plan in request.plans if plan.is_active]
@@ -16,7 +18,7 @@ class IncomePlanService:
 
         reo_id = reo_ids.pop()
 
-        reo = await self.repository.get_reo(reo_id=reo_id)
+        reo = await self.reo_repository.get(id=reo_id)
         if not reo:
             raise ObjectNotFound(model_name="RealEstateObject", id_=reo_id)
 
@@ -30,13 +32,15 @@ class IncomePlanService:
         plan = await self.repository.create(data.model_dump())
         return IncomePlanResponse.model_validate(plan)
 
-    async def get(self, id: int,) -> IncomePlanResponse:
+    async def get(
+        self,
+        id: int,
+    ) -> IncomePlanResponse:
         plan = await self.repository.get(plan_id=id)
         if not plan:
             raise ObjectNotFound(model_name="IncomePlan", id_=id)
 
         return IncomePlanResponse.model_validate(plan)
-
 
     async def get_all(self) -> list[IncomePlanResponse]:
         plans = await self.repository.get_all()

@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
+from pydantic import BaseModel, Field
 
 
 class SalesCreate(BaseModel):
@@ -14,6 +14,7 @@ class SalesCreate(BaseModel):
     class Config:
         from_attributes = True
 
+
 class SalesUpdate(BaseModel):
     premises_id: Optional[int] = None
     saledate: Optional[datetime] = None
@@ -23,6 +24,7 @@ class SalesUpdate(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 class SalesResponse(BaseModel):
     id: int

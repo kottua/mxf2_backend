@@ -1,9 +1,9 @@
 from typing import List
 
-from sqlalchemy import Integer, Boolean, ForeignKey, JSON
+from app.infrastructure.postgres.models.base import Base
+from sqlalchemy import JSON, Boolean, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.infrastructure.postgres.models.base import Base
 
 class PricingConfig(Base):
     __tablename__ = "pricing_configs"
@@ -16,7 +16,4 @@ class PricingConfig(Base):
     real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="pricing_configs")
     committed_prices: Mapped[List["CommittedPrices"]] = relationship(back_populates="pricing_config")
 
-    __table_args__ = {
-        "sqlite_autoincrement": True,
-        "extend_existing": True
-    }
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}
