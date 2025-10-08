@@ -1,10 +1,10 @@
 import uvicorn
-from starlette.middleware.cors import CORSMiddleware
 from app.application.api import error_handlers
 from app.application.api.v1 import routers
 from app.core import exceptions
 from app.settings import settings
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 
 def _include_middleware(app: FastAPI) -> None:
@@ -15,6 +15,7 @@ def _include_middleware(app: FastAPI) -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
 
 def _include_router(app: FastAPI) -> None:
     app.include_router(routers)
