@@ -25,8 +25,8 @@ class PricingConfigResponse(BaseModel):
     id: int
     is_active: bool
     reo_id: int
-    created: datetime
-    updated: datetime
+    created_at: datetime
+    updated_at: datetime
     content: dict
 
     class Config:

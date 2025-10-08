@@ -8,7 +8,7 @@ from app.application.api.v1.sales import router as sales_router
 from app.application.api.v1.status_mappings import router as status_mappings_router
 from fastapi import APIRouter
 
-routers = APIRouter()
+routers = APIRouter(prefix="/api/v1")
 
 routers.include_router(real_estate_objects_router, prefix="/real-estate-objects", tags=["Real Estate Objects"])
 routers.include_router(pricing_configs_router, prefix="/pricing-configs", tags=["Pricing Configs"])

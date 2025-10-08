@@ -39,8 +39,8 @@ class RealEstateObjectResponse(BaseModel):
     lat: Optional[float]
     curr: Optional[str]
     url: Optional[str]
-    created: datetime
-    updated: datetime
+    created_at: datetime
+    updated_at: datetime
     is_deleted: bool
     custom_fields: Optional[dict]
 
@@ -55,8 +55,8 @@ class RealEstateObjectFullResponse(BaseModel):
     lat: Optional[float]
     curr: Optional[str]
     url: Optional[str]
-    created: datetime
-    updated: datetime
+    created_at: datetime
+    updated_at: datetime
     is_deleted: bool
     custom_fields: Optional[dict]
 
