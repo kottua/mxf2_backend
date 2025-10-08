@@ -22,8 +22,23 @@ def _include_router(app: FastAPI) -> None:
 
 
 def _include_error_handlers(app: FastAPI) -> None:
-    app.add_exception_handler(exceptions.ObjectAlreadyExists, error_handlers.handle_object_already_exists)
-    app.add_exception_handler(exceptions.ObjectNotFound, error_handlers.handle_object_not_found)
+    app.add_exception_handler(
+        exceptions.ObjectAlreadyExists, error_handlers.handle_object_already_exists  # type: ignore
+    )
+    app.add_exception_handler(exceptions.ObjectNotFound, error_handlers.handle_object_not_found)  # type: ignore
+    app.add_exception_handler(
+        exceptions.InvalidFileFormatException, error_handlers.handle_invalid_file_format  # type: ignore
+    )
+    app.add_exception_handler(exceptions.FileReadException, error_handlers.handle_file_read_exception)  # type: ignore
+    app.add_exception_handler(
+        exceptions.MissingRequiredColumnsException, error_handlers.handle_missing_required_columns  # type: ignore
+    )
+    app.add_exception_handler(
+        exceptions.DataValidationException, error_handlers.handle_data_validation_exception  # type: ignore
+    )
+    app.add_exception_handler(
+        exceptions.FileProcessingException, error_handlers.handle_file_processing_exception  # type: ignore
+    )
 
 
 def create_app() -> FastAPI:

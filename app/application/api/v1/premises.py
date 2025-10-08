@@ -1,14 +1,31 @@
-from app.application.api.depends import premises_service_deps
+from app.application.api.depends import file_processing_service_deps, premises_service_deps
 from app.core.schemas.premise_schemas import (
     BulkPremisesCreateRequest,
     PremisesCreate,
+    PremisesFileSpecificationResponse,
     PremisesResponse,
     PremisesUpdate,
 )
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 from starlette import status
 
 router = APIRouter()
+
+
+@router.post("/upload/specification", response_model=list[PremisesFileSpecificationResponse])
+async def upload_premises_specification(
+    file: UploadFile,
+    file_processing_service: file_processing_service_deps,
+) -> list[PremisesFileSpecificationResponse]:
+    # Read file content
+    file_content = await file.read()
+
+    # Process file using service layer
+    premises_data = await file_processing_service.process_specification(
+        file_content=file_content, filename=file.filename or "unknown"
+    )
+
+    return premises_data
 
 
 @router.post("/bulk", response_model=list[PremisesResponse])
