@@ -3,3 +3,13 @@ test_main.http
 
 .env
 venv/
+postgres_data/
+
+.idea
+__pycache__/
+*.pyc
+.DS_Store
+.vscode/
+*.log
+*.sqlite3
+*.egg-info/
