@@ -1,14 +1,31 @@
-from app.application.api.depends import income_plan_service_deps
+from app.application.api.depends import file_processing_service_deps, income_plan_service_deps
 from app.core.schemas.income_plan_schemas import (
     BulkIncomePlanCreate,
     IncomePlanCreate,
+    IncomePlanFileResponse,
     IncomePlanResponse,
     IncomePlanUpdate,
 )
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile
 from starlette import status
 
 router = APIRouter()
+
+
+@router.post("/upload/income-plans", response_model=list[IncomePlanFileResponse])
+async def upload_premises_specification(
+    file: UploadFile,
+    file_processing_service: file_processing_service_deps,
+) -> list[IncomePlanFileResponse]:
+    # Read file content
+    file_content = await file.read()
+
+    # Process file using service layer
+    premises_data = await file_processing_service.process_income_plan(
+        file_content=file_content, filename=file.filename or "unknown"
+    )
+
+    return premises_data
 
 
 @router.post("/bulk", response_model=list[IncomePlanResponse])

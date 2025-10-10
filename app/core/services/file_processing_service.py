@@ -1,8 +1,7 @@
-from typing import Any, Dict, List
-
 import pandas as pd
 from app.core.exceptions.domain import DataValidationException, MissingRequiredColumnsException
 from app.core.interfaces.file_processing import FileProcessingInterface
+from app.core.schemas.income_plan_schemas import IncomePlanFileResponse
 from app.core.schemas.premise_schemas import PremisesFileSpecificationResponse
 
 
@@ -73,7 +72,7 @@ class FileProcessingService:
 
         return premises_list
 
-    async def process_income_plan(self, file_content: bytes, filename: str) -> List[Dict[str, Any]]:
+    async def process_income_plan(self, file_content: bytes, filename: str) -> list[IncomePlanFileResponse]:
         """
         Process uploaded income plan file.
 
@@ -87,7 +86,31 @@ class FileProcessingService:
         Raises:
             NotImplementedError: Method not yet implemented
         """
-        raise NotImplementedError("Income plan processing not yet implemented")
+        # Step 1: Validate file format (business rule)
+        self.file_processor.validate_file_format(filename)
+
+        # Step 2: Read Excel file (technical operation)
+        df = await self.file_processor.read_excel_file(file_content, filename)
+
+        # Step 3: Validate required columns (business rule)
+        self._validate_required_columns(df, IncomePlanFileResponse.PREDEFINED_COLUMNS)
+
+        income_plans: list[IncomePlanFileResponse] = []
+        for i, row in df.iterrows():
+            try:
+                # Validate row data using Pydantic model (business logic)
+                income_plan_row = IncomePlanFileResponse.model_validate(dict(row))
+                income_plans.append(income_plan_row)
+
+            except Exception as e:
+                # Extract validation errors for better error reporting
+                error_details = str(e)
+                if hasattr(e, "errors"):
+                    error_details = str(e.errors())
+
+                raise DataValidationException(row_number=i + 2, error_details=error_details)
+
+        return income_plans
 
     def _validate_required_columns(self, df: pd.DataFrame, predefined_columns: list[str]) -> None:
         """
