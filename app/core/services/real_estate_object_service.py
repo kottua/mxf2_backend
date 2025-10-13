@@ -1,4 +1,4 @@
-from app.core.exceptions import ObjectNotFound
+from app.core.exceptions import ObjectAlreadyExists, ObjectNotFound
 from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
 from app.core.schemas.real_estate_object_schemas import (
     RealEstateObjectCreate,
@@ -13,6 +13,10 @@ class RealEstateObjectService:
         self.repository = repository
 
     async def create(self, data: RealEstateObjectCreate) -> RealEstateObjectResponse:
+        reo = await self.get_by_name(name=data.name)
+        if reo:
+            raise ObjectAlreadyExists(message="Real Estate with this name already exists")
+
         reo = await self.repository.create(data.model_dump())
         return RealEstateObjectResponse.model_validate(reo)
 
@@ -26,6 +30,13 @@ class RealEstateObjectService:
     async def get_all(self) -> list[RealEstateObjectResponse]:
         reos = await self.repository.get_all()
         return [RealEstateObjectResponse.model_validate(reo) for reo in reos]
+
+    async def get_by_name(self, name: str) -> RealEstateObjectResponse | None:
+        reo = await self.repository.get_by_name(name)
+        if not reo:
+            return None
+
+        return RealEstateObjectResponse.model_validate(reo)
 
     async def get(self, id: int) -> RealEstateObjectResponse:
         reo = await self.repository.get(id)

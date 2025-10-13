@@ -24,6 +24,12 @@ class RealEstateObjectRepository(RealEstateObjectRepositoryInterface):
         return result
 
     @provide_async_session
+    async def get_by_name(self, name: str, session: AsyncSession) -> RealEstateObject | None:
+        result = await session.execute(select(RealEstateObject).filter_by(name=name, is_deleted=False))
+        reo = result.scalars().first()
+        return reo
+
+    @provide_async_session
     async def get_full(self, id: int, session: AsyncSession) -> RealEstateObject | None:
         options = [
             selectinload(RealEstateObject.premises),

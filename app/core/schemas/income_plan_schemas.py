@@ -9,8 +9,8 @@ from pydantic import BaseModel, Field, field_validator
 class IncomePlanCreate(BaseModel):
     reo_id: int
     property_type: str
-    period_begin: str
-    period_end: str
+    period_begin: datetime
+    period_end: datetime
     area: float = Field(..., gt=0)
     planned_sales_revenue: float = Field(..., ge=0)
     price_per_sqm: float = Field(..., ge=0)
@@ -18,12 +18,18 @@ class IncomePlanCreate(BaseModel):
     is_active: bool = True
 
     @field_validator("period_begin", "period_end", mode="before")
-    def validate_date_format(cls, value: str) -> str:
-        try:
-            datetime.strptime(value, "%d/%m/%Y")
+    @classmethod
+    def parse_date(cls, value: str | datetime) -> datetime:
+        if isinstance(value, datetime):
             return value
-        except ValueError:
-            raise ValueError(f"Invalid date format: '{value}'. Expected DD/MM/YYYY.")
+        if isinstance(value, str):
+            for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S"):
+                try:
+                    return datetime.strptime(value, fmt)
+                except ValueError:
+                    continue
+            raise ValueError(f"Invalid date format: {value}. Expected DD/MM/YYYY or ISO8601.")
+        raise TypeError(f"Unsupported type for date: {type(value)}")
 
     class Config:
         from_attributes = True
@@ -98,7 +104,7 @@ class IncomePlanFileResponse(BaseModel):
     @classmethod
     def convert_timestamp(cls, value: str | pd.Timestamp) -> str | pd.Timestamp:
         if isinstance(value, pd.Timestamp):
-            return value.strftime("%Y-%m-%d")
+            return value.strftime("%d/%m/%Y")
         return value
 
 

@@ -21,8 +21,9 @@ class IncomePlanService:
         reo = await self.reo_repository.get(id=reo_id)
         if not reo:
             raise ObjectNotFound(model_name="RealEstateObject", id_=reo_id)
+        plans_data = [plan.model_dump() for plan in request.plans]
 
-        income_plans = await self.repository.create_bulk_income_plans(data=request.model_dump(), reo_id=reo.id)
+        income_plans = await self.repository.create_bulk_income_plans(data=plans_data, reo_id=reo.id)
         return [IncomePlanResponse.model_validate(plan) for plan in income_plans]
 
     async def create(self, data: IncomePlanCreate) -> IncomePlanResponse:

@@ -35,3 +35,7 @@ class RealEstateObjectRepositoryInterface(ABC):
     async def delete(self, reo: Any) -> None:
         """Delete an income plan."""
         raise NotImplementedError
+
+    async def get_by_name(self, name: str) -> Any:
+        """Retrieve an income plan by its name."""
+        raise NotImplementedError

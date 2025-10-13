@@ -32,7 +32,7 @@ class IncomePlanRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def create_bulk_income_plans(self, data: dict, reo_id: int) -> Any:
+    async def create_bulk_income_plans(self, data: list[dict], reo_id: int) -> Any:
         """Create income plans in bulk associated with a specific REO."""
         raise NotImplementedError
 
