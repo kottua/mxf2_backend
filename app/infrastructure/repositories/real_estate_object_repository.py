@@ -1,11 +1,11 @@
 from typing import Sequence
 
 from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
-from app.infrastructure.postgres.models import RealEstateObject
+from app.infrastructure.postgres.models import PricingConfig, RealEstateObject
 from app.infrastructure.postgres.session_manager import provide_async_session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, with_loader_criteria
 
 
 class RealEstateObjectRepository(RealEstateObjectRepositoryInterface):
@@ -33,8 +33,11 @@ class RealEstateObjectRepository(RealEstateObjectRepositoryInterface):
     async def get_full(self, id: int, session: AsyncSession) -> RealEstateObject | None:
         options = [
             selectinload(RealEstateObject.premises),
-            selectinload(RealEstateObject.income_plans),
             selectinload(RealEstateObject.pricing_configs),
+            with_loader_criteria(PricingConfig, PricingConfig.is_active == True),
+            selectinload(RealEstateObject.committed_prices),
+            selectinload(RealEstateObject.income_plans),
+            selectinload(RealEstateObject.status_mappings),
         ]
         result = await session.get(RealEstateObject, id, options=options)
         return result

@@ -1,3 +1,4 @@
+from app.application.api.v1.calculations import router as calculations_router
 from app.application.api.v1.committed_prices import router as committed_prices_router
 from app.application.api.v1.distribution_configs import router as distribution_configs_router
 from app.application.api.v1.income_plans import router as income_plans_router
@@ -10,6 +11,7 @@ from fastapi import APIRouter
 
 routers = APIRouter(prefix="/api/v1")
 
+routers.include_router(calculations_router, prefix="/calculate", tags=["Calculations"])
 routers.include_router(real_estate_objects_router, prefix="/real-estate-objects", tags=["Real Estate Objects"])
 routers.include_router(pricing_configs_router, prefix="/pricing-configs", tags=["Pricing Configs"])
 routers.include_router(distribution_configs_router, prefix="/distribution-configs", tags=["Distribution Configs"])

@@ -8,6 +8,7 @@ from app.core.services.premises_service import PremisesService
 from app.core.services.pricing_config_service import PricingConfigService
 from app.core.services.real_estate_object_service import RealEstateObjectService
 from app.core.services.sales_service import SalesService
+from app.core.services.scoring_calculation_service import ScoringCalculationService
 from app.core.services.status_mapping_service import StatusMappingService
 from app.infrastructure.excel.excel_processor import ExcelProcessor
 from app.infrastructure.repositories.committed_prices_repository import CommittedPricesRepository
@@ -113,6 +114,15 @@ def get_file_processing_service(
     return FileProcessingService(file_processor=file_processor)
 
 
+def get_scoring_service(
+    reo_repository: RealEstateObjectRepository = Depends(get_real_estate_object_repository),
+    distribution_config_repository: DistributionConfigsRepository = Depends(get_distribution_config_repository),
+) -> ScoringCalculationService:
+    return ScoringCalculationService(
+        reo_repository=reo_repository, distribution_config_repository=distribution_config_repository
+    )
+
+
 committed_service_deps = Annotated[CommittedPricesService, Depends(get_commited_service)]
 distribution_config_service_deps = Annotated[DistributionConfigsService, Depends(get_distribution_config_service)]
 file_processing_service_deps = Annotated[FileProcessingService, Depends(get_file_processing_service)]
@@ -122,3 +132,4 @@ premises_service_deps = Annotated[PremisesService, Depends(get_premises_service)
 status_mapping_service_deps = Annotated[StatusMappingService, Depends(get_status_mapping_service)]
 sales_service_deps = Annotated[SalesService, Depends(get_sales_service)]
 pricing_config_service_deps = Annotated[PricingConfigService, Depends(get_pricing_config_service)]
+scoring_service_deps = Annotated[ScoringCalculationService, Depends(get_scoring_service)]

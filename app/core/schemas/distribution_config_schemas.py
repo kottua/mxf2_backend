@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class DistributionConfigCreate(BaseModel):
     func_name: str
     content: dict
-    is_active: bool = False
+    is_active: bool = True
 
     class Config:
         from_attributes = True

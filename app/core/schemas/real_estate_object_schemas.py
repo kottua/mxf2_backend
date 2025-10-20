@@ -1,9 +1,11 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
+from app.core.schemas import CommittedPricesResponse
 from app.core.schemas.income_plan_schemas import IncomePlanResponse
 from app.core.schemas.premise_schemas import PremisesResponse
 from app.core.schemas.pricing_config_schemas import PricingConfigResponse
+from app.core.schemas.status_mapping_schemas import StatusMappingResponse
 from pydantic import BaseModel, Field
 
 
@@ -60,9 +62,11 @@ class RealEstateObjectFullResponse(BaseModel):
     is_deleted: bool
     custom_fields: Optional[dict]
 
-    premises: List[PremisesResponse]
-    income_plans: List[IncomePlanResponse]
-    pricing_configs: List[PricingConfigResponse]
+    premises: list[PremisesResponse]
+    pricing_configs: list[PricingConfigResponse]
+    committed_prices: list[CommittedPricesResponse]
+    income_plans: list[IncomePlanResponse]
+    status_mappings: list[StatusMappingResponse]
 
     class Config:
         from_attributes = True
