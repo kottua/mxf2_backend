@@ -10,7 +10,7 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.post("/scoring/{reo_id}/{distribution_config_id}", response_model=RealEstateObjectWithCalculations)
+@router.get("/scoring/{reo_id}/{distribution_config_id}", response_model=RealEstateObjectWithCalculations)
 async def calculate_scoring(
     reo_id: int, distribution_config_id: int, scoring_service: scoring_service_deps
 ) -> RealEstateObjectWithCalculations:
