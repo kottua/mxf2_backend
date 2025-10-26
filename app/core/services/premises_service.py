@@ -23,6 +23,7 @@ class PremisesService:
         if not reo:
             raise ObjectNotFound(model_name="RealEstateObject", id_=reo_id)
         premises_data = [premise.model_dump() for premise in data.premises]
+        await self.repository.deactivate_premises(reo_id=reo.id)
 
         premises = await self.repository.create_bulk_premises(data=premises_data, reo_id=reo.id)
         return [PremisesResponse.model_validate(premise) for premise in premises]

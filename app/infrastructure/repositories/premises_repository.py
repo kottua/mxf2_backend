@@ -43,6 +43,15 @@ class PremisesRepository(PremisesRepositoryInterface):
         await session.commit()
 
     @provide_async_session
+    async def deactivate_premises(self, reo_id: int, session: AsyncSession) -> None:
+        result = await session.execute(select(Premises).where(Premises.reo_id == reo_id, Premises.is_active == True))
+        active_premises = result.scalars().all()
+        for premises in active_premises:
+            premises.is_active = False
+            session.add(premises)
+        await session.commit()
+
+    @provide_async_session
     async def fetch_recent_premises(self, reo_id: int, limit: int, session: AsyncSession) -> Sequence[Premises]:
         result = await session.execute(
             select(Premises).where(Premises.reo_id == reo_id).order_by(Premises.id.desc()).limit(limit)

@@ -30,6 +30,11 @@ class PremisesRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def deactivate_premises(self, reo_id: int) -> None:
+        """Deactivate all premises associated with a specific REO."""
+        raise NotImplementedError
+
+    @abstractmethod
     async def create_bulk_premises(self, data: list[dict], reo_id: int) -> Any:
         """Create multiple premises records in bulk."""
         raise NotImplementedError

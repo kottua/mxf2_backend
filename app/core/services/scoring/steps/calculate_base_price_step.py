@@ -9,9 +9,13 @@ logger = logging.getLogger(__name__)
 class CalculateBasePrice(PipelineStep):
 
     def handle(self, context: RealEstateObjectWithCalculations) -> RealEstateObjectWithCalculations:
-        content = context.pricing_configs[-1].content
-        price_per_sqm = (content.get("staticConfig") or {}).get("current_price_per_sqm")
+        prices_per_sqm = []
+        for config in context.pricing_configs:
+            value = (config.get("staticConfig") or {}).get("current_price_per_sqm")
+            if value is not None:
+                prices_per_sqm.append(value)
 
+        price_per_sqm = min(prices_per_sqm)
         if price_per_sqm is None or not isinstance(price_per_sqm, (int, float)):
             logger.error("Invalid input: price_per_sqm is undefined or not a number")
             return context

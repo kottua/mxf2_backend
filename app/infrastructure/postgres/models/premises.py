@@ -36,6 +36,7 @@ class Premises(Base):
     status: Mapped[str] = mapped_column(String, nullable=False)
     sales_amount: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     customcontent: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     # Relationships
     real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="premises")
