@@ -26,3 +26,6 @@ pydantic-settings==2.11.0
 python-multipart==0.0.20
 pre-commit==4.3.0
 openpyxl==3.1.5
+pydantic[email]==2.11.7
+PyJWT==2.10.1
+passlib==1.7.4
