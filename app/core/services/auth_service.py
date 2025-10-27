@@ -24,7 +24,7 @@ class AuthService(AuthSecurity):
         user = await self.user_repository.get(email)
         if not user:
             raise ObjectNotFound("User", email)
-        return user
+        return UserOutputSchema.model_validate(user)
 
     def generate_tokens_for_user(self, user: UserOutputSchema) -> TokenSchema:
         access_token = self.create_token(
