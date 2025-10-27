@@ -42,9 +42,7 @@ class AuthSecurity:
                 raise InvalidCredentials("Invalid token type")
             return True
 
-        except jwt.ExpiredSignatureError:
-            return False
-        except jwt.InvalidTokenError:
+        except InvalidCredentials:
             return False
         except ValueError:
             return False
