@@ -25,39 +25,14 @@ class CalculateFitCondValues(PipelineStep):
             return context
 
         # Get current price per square meter from pricing config
-        current_price_per_sqm = self._get_current_price_per_sqm(context)
-        if current_price_per_sqm is None:
-            logger.error("Could not get current price per square meter from pricing config")
-            return context
-
-        # Get min and max liquidation rates from premises
-        min_liq_rate = None
-        max_liq_rate = None
-        for premise in context.premises:
-            if min_liq_rate is None or premise.calculation.min_liq_rate < min_liq_rate:
-                min_liq_rate = premise.calculation.min_liq_rate
-            if max_liq_rate is None or premise.calculation.max_liq_rate > max_liq_rate:
-                max_liq_rate = premise.calculation.max_liq_rate
-
-        # Validate inputs
-        if (
-            min_liq_rate is None
-            or math.isnan(min_liq_rate)
-            or max_liq_rate is None
-            or math.isnan(max_liq_rate)
-            or current_price_per_sqm is None
-            or math.isnan(current_price_per_sqm)
-        ):
-            logger.error("Invalid liquidation rates or current price per square meter")
-            return context
-
-        if current_price_per_sqm == 0:
-            logger.warning("Warning: currentPricePerSQM is zero, using 1e-10")
-            current_price_per_sqm = 1e-10
+        static_config = self._get_current_price_per_sqm(context)
+        current_price_per_sqm = static_config.get("current_price_per_sqm", 0.0)
+        minimum_liq_refusal_price = static_config.get("minimum_liq_refusal_price", 0.0)
+        maximum_liq_refusal_price = static_config.get("maximum_liq_refusal_price", 0.0)
 
         # Calculate b_rate_net and t_rate_net
-        b_rate_net = 1 - min_liq_rate / current_price_per_sqm
-        t_rate_net = max_liq_rate / current_price_per_sqm - 1
+        b_rate_net = 1 - minimum_liq_refusal_price / current_price_per_sqm
+        t_rate_net = maximum_liq_refusal_price / current_price_per_sqm - 1
 
         # Get normalized running total values
         sp_mixed_rt_norm = [premise.calculation.normalized_running_total for premise in context.premises]
@@ -124,32 +99,46 @@ class CalculateFitCondValues(PipelineStep):
 
         return context
 
-    def _get_current_price_per_sqm(self, context: RealEstateObjectWithCalculations) -> float | None:
+    def _get_current_price_per_sqm(self, context: RealEstateObjectWithCalculations) -> dict:
         """
         Extract current price per square meter from pricing config.
         """
+        initial_price_data = {
+            "current_price_per_sqm": 0.0,
+            "minimum_liq_refusal_price": 0.0,
+            "maximum_liq_refusal_price": 0.0,
+        }
+
         try:
             if not context.pricing_configs or len(context.pricing_configs) == 0:
                 logger.error("No pricing configs found")
-                return None
+                return initial_price_data
 
             content = context.pricing_configs[-1].content
-            if not content:
-                logger.error("Pricing config content is empty")
-                return None
 
-            static_config = content.get("staticConfig")
-            if not static_config:
-                logger.error("Static config not found in pricing config")
-                return None
+            static_config = content.get("staticConfig", {})
 
-            current_price_per_sqm = static_config.get("current_price_per_sqm")
+            current_price_per_sqm = static_config.get("current_price_per_sqm", None)
             if current_price_per_sqm is None:
                 logger.error("current_price_per_sqm not found in static config")
-                return None
+                initial_price_data["current_price_per_sqm"] = 0.0
 
-            return float(current_price_per_sqm)
+            maximum_liq_refusal_price = static_config.get("maximum_liq_refusal_price", None)
+            if maximum_liq_refusal_price is None:
+                logger.error("maximum_liq_refusal_price not found in static config")
+                initial_price_data["maximum_liq_refusal_price"] = 0.0
+
+            minimum_liq_refusal_price = static_config.get("minimum_liq_refusal_price", None)
+            if minimum_liq_refusal_price is None:
+                logger.error("minimum_liq_refusal_price not found in static config")
+                initial_price_data["minimum_liq_refusal_price"] = 0.0
+
+            return {
+                "current_price_per_sqm": float(current_price_per_sqm),
+                "minimum_liq_refusal_price": float(minimum_liq_refusal_price),
+                "maximum_liq_refusal_price": float(maximum_liq_refusal_price),
+            }
 
         except Exception as e:
             logger.error(f"Error extracting current price per square meter: {e}")
-            return None
+            return initial_price_data
