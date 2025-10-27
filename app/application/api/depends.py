@@ -50,7 +50,7 @@ async def get_current_user(auth_service: auth_service_deps, token: token_deps) -
     return await auth_service.get_current_user(token.credentials)
 
 
-current_user_deps = Annotated[User, Depends(get_current_user)]
+current_user_deps = Annotated[UserOutputSchema, Depends(get_current_user)]
 user_service_deps = Annotated[UserService, Depends(get_user_service)]
 
 
