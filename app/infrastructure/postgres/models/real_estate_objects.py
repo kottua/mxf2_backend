@@ -1,7 +1,7 @@
 from typing import List, Optional
 
 from app.infrastructure.postgres.models.base import Base
-from sqlalchemy import JSON, Boolean, Float, String
+from sqlalchemy import JSON, Boolean, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -15,8 +15,10 @@ class RealEstateObject(Base):
     url: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     custom_fields: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
     # Relationships
+    user: Mapped["User"] = relationship(back_populates="real_estate_objects")
     premises: Mapped[List["Premises"]] = relationship(back_populates="real_estate_object")
     pricing_configs: Mapped[List["PricingConfig"]] = relationship(back_populates="real_estate_object")
     committed_prices: Mapped[List["CommittedPrices"]] = relationship(back_populates="real_estate_object")

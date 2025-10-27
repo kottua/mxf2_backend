@@ -2,6 +2,7 @@ from app.core.exceptions import ObjectNotFound, ValidationException
 from app.core.interfaces.income_plans_repository import IncomePlanRepositoryInterface
 from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
 from app.core.schemas.income_plan_schemas import BulkIncomePlanCreate, IncomePlanCreate, IncomePlanResponse
+from app.core.schemas.user_schemas import UserOutputSchema
 
 
 class IncomePlanService:
@@ -9,7 +10,9 @@ class IncomePlanService:
         self.repository = repository
         self.reo_repository = reo_repository
 
-    async def create_bulk_income_plans(self, request: BulkIncomePlanCreate) -> list[IncomePlanResponse]:
+    async def create_bulk_income_plans(
+        self, request: BulkIncomePlanCreate, user: UserOutputSchema
+    ) -> list[IncomePlanResponse]:
         active_plans = [plan for plan in request.plans if plan.is_active]
 
         reo_ids = {plan.reo_id for plan in active_plans}
@@ -18,7 +21,7 @@ class IncomePlanService:
 
         reo_id = reo_ids.pop()
 
-        reo = await self.reo_repository.get(id=reo_id)
+        reo = await self.reo_repository.get(id=reo_id, user_id=user.id)
         if not reo:
             raise ObjectNotFound(model_name="RealEstateObject", id_=reo_id)
         plans_data = [plan.model_dump() for plan in request.plans]

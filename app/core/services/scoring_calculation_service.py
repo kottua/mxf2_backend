@@ -2,6 +2,7 @@ from app.core.interfaces.distribution_configs_repository import DistributionConf
 from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
 from app.core.schemas.calculation_schemas import RealEstateObjectWithCalculations
 from app.core.schemas.real_estate_object_schemas import RealEstateObjectFullResponse
+from app.core.schemas.user_schemas import UserOutputSchema
 from app.core.services.scoring import CalculateBasePrice, ScoringPipeline
 from app.core.services.scoring.steps import (
     CalculateActualCosts,
@@ -33,9 +34,13 @@ class ScoringCalculationService:
         self.reo_repository = reo_repository
         self.distribution_config_repository = distribution_config_repository
 
-    async def calculate_scoring(self, reo_id: int, distribution_config_id: int) -> RealEstateObjectWithCalculations:
-        reo = await self.reo_repository.get_full(id=reo_id)
-        distribution_config = await self.distribution_config_repository.get(config_id=distribution_config_id)
+    async def calculate_scoring(
+        self, reo_id: int, distribution_config_id: int, user: UserOutputSchema
+    ) -> RealEstateObjectWithCalculations:
+        reo = await self.reo_repository.get_full(id=reo_id, user_id=user.id)
+        distribution_config = await self.distribution_config_repository.get(
+            config_id=distribution_config_id, user_id=user.id
+        )
         reo_pydantic = RealEstateObjectFullResponse.model_validate(reo)
         reo_context = RealEstateObjectWithCalculations(
             **reo_pydantic.model_dump(), distribution_config=distribution_config

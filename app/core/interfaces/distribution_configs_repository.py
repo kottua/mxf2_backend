@@ -5,12 +5,12 @@ from typing import Any
 class DistributionConfigsRepositoryInterface(ABC):
 
     @abstractmethod
-    async def create(self, data: dict) -> dict:
+    async def create(self, data: dict, user_id: int) -> dict:
         """Create a new distribution configuration."""
         raise NotImplementedError
 
     @abstractmethod
-    async def get(self, config_id: int) -> dict | None:
+    async def get(self, config_id: int, user_id: int) -> dict | None:
         """Retrieve a distribution configuration by its ID."""
         raise NotImplementedError
 
@@ -24,6 +24,6 @@ class DistributionConfigsRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_all(self) -> list[dict]:
+    async def get_all(self, user_id: int) -> list[dict]:
         """Retrieve all distribution configurations with pagination."""
         raise NotImplementedError

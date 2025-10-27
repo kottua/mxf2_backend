@@ -1,5 +1,7 @@
 from typing import Annotated
 
+from app.core.schemas.user_schemas import UserOutputSchema
+from app.core.services.auth_service import AuthService
 from app.core.services.committed_price_service import CommittedPricesService
 from app.core.services.distribution_config_service import DistributionConfigsService
 from app.core.services.file_processing_service import FileProcessingService
@@ -10,7 +12,9 @@ from app.core.services.real_estate_object_service import RealEstateObjectService
 from app.core.services.sales_service import SalesService
 from app.core.services.scoring_calculation_service import ScoringCalculationService
 from app.core.services.status_mapping_service import StatusMappingService
+from app.core.services.user_service import UserService
 from app.infrastructure.excel.excel_processor import ExcelProcessor
+from app.infrastructure.postgres.models.users import User
 from app.infrastructure.repositories.committed_prices_repository import CommittedPricesRepository
 from app.infrastructure.repositories.distribution_configs_repository import DistributionConfigsRepository
 from app.infrastructure.repositories.income_plans_repository import IncomePlanRepository
@@ -19,7 +23,35 @@ from app.infrastructure.repositories.pricing_config_repository import PricingCon
 from app.infrastructure.repositories.real_estate_object_repository import RealEstateObjectRepository
 from app.infrastructure.repositories.sales_repository import SalesRepository
 from app.infrastructure.repositories.status_mapping_repository import StatusMappingRepository
+from app.infrastructure.repositories.user_repository import UserRepository
 from fastapi import Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+http_bearer = HTTPBearer()
+
+
+def get_user_repository() -> UserRepository:
+    return UserRepository()
+
+
+def get_user_service(user_repository: UserRepository = Depends(get_user_repository)) -> UserService:
+    return UserService(user_repository=user_repository)
+
+
+def get_auth_service(user_repository: UserRepository = Depends(get_user_repository)) -> AuthService:
+    return AuthService(user_repository=user_repository)
+
+
+auth_service_deps = Annotated[AuthService, Depends(get_auth_service)]
+token_deps = Annotated[HTTPAuthorizationCredentials, Depends(http_bearer)]
+
+
+async def get_current_user(auth_service: auth_service_deps, token: token_deps) -> UserOutputSchema:
+    return await auth_service.get_current_user(token.credentials)
+
+
+current_user_deps = Annotated[User, Depends(get_current_user)]
+user_service_deps = Annotated[UserService, Depends(get_user_service)]
 
 
 def get_company_repository() -> CommittedPricesRepository:

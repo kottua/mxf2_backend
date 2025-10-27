@@ -12,6 +12,11 @@ class ObjectNotFound(Exception):
         super().__init__(self.msg)
 
 
+class InvalidCredentials(Exception):
+    def __init__(self, message: Optional[str] = "Invalid credentials provided") -> None:
+        super().__init__(message)
+
+
 class ValidationException(Exception):
     def __init__(self, message: Optional[str] = "Validation error occurred") -> None:
         super().__init__(message)

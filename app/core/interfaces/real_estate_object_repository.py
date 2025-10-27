@@ -7,22 +7,22 @@ from app.core.schemas.real_estate_object_schemas import RealEstateObjectResponse
 class RealEstateObjectRepositoryInterface(ABC):
 
     @abstractmethod
-    async def create(self, data: dict) -> RealEstateObjectResponse:
+    async def create(self, data: dict, user_id: int) -> RealEstateObjectResponse:
         """Create income plans in bulk."""
         raise NotImplementedError
 
     @abstractmethod
-    async def get(self, id: int) -> Any:
+    async def get(self, id: int, user_id: int) -> Any:
         """Retrieve an income plan by its ID."""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_full(self, id: int) -> Any:
+    async def get_full(self, id: int, user_id: int) -> Any:
         """Retrieve an income plan by its ID."""
         raise NotImplementedError
 
     @abstractmethod
-    async def get_all(self) -> list[RealEstateObjectResponse]:
+    async def get_all(self, user_id: int) -> list[RealEstateObjectResponse]:
         """Retrieve all income plans."""
         raise NotImplementedError
 
@@ -36,6 +36,6 @@ class RealEstateObjectRepositoryInterface(ABC):
         """Delete an income plan."""
         raise NotImplementedError
 
-    async def get_by_name(self, name: str) -> Any:
+    async def get_by_name(self, name: str, user_id: int) -> Any:
         """Retrieve an income plan by its name."""
         raise NotImplementedError

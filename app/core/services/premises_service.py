@@ -7,6 +7,7 @@ from app.core.schemas.premise_schemas import (
     PremisesResponse,
     PremisesUpdate,
 )
+from app.core.schemas.user_schemas import UserOutputSchema
 
 
 class PremisesService:
@@ -14,12 +15,14 @@ class PremisesService:
         self.repository = repository
         self.reo_repository = reo_repository
 
-    async def create_bulk_premises(self, data: BulkPremisesCreateRequest) -> list[PremisesResponse]:
+    async def create_bulk_premises(
+        self, data: BulkPremisesCreateRequest, user: UserOutputSchema
+    ) -> list[PremisesResponse]:
         reo_ids = {premise.reo_id for premise in data.premises}
         if len(reo_ids) > 1:
             raise ValidationException(message="All premises must reference the same RealEstateObject")
         reo_id = reo_ids.pop()
-        reo = await self.reo_repository.get(id=reo_id)
+        reo = await self.reo_repository.get(id=reo_id, user_id=user.id)
         if not reo:
             raise ObjectNotFound(model_name="RealEstateObject", id_=reo_id)
         premises_data = [premise.model_dump() for premise in data.premises]
