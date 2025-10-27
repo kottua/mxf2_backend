@@ -31,3 +31,7 @@ def handle_file_processing_exception(_: Request, e: exceptions.FileProcessingExc
     return JSONResponse(
         content={"message": f"File processing error: {str(e)}"}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     )
+
+
+def handle_invalid_credentials(_: Request, e: exceptions.InvalidCredentials) -> JSONResponse:
+    return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_401_UNAUTHORIZED)

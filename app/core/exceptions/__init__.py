@@ -2,6 +2,7 @@ from app.core.exceptions.domain import (
     DataValidationException,
     FileProcessingException,
     FileReadException,
+    InvalidCredentials,
     InvalidFileFormatException,
     MissingRequiredColumnsException,
     ObjectAlreadyExists,
@@ -18,4 +19,5 @@ __all__ = [
     "FileReadException",
     "DataValidationException",
     "FileProcessingException",
+    "InvalidCredentials",
 ]

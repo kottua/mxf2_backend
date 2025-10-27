@@ -1,3 +1,4 @@
+from app.application.api.v1.auth import router as auth_router
 from app.application.api.v1.calculations import router as calculations_router
 from app.application.api.v1.committed_prices import router as committed_prices_router
 from app.application.api.v1.distribution_configs import router as distribution_configs_router
@@ -7,10 +8,13 @@ from app.application.api.v1.pricing_configs import router as pricing_configs_rou
 from app.application.api.v1.real_estate_objects import router as real_estate_objects_router
 from app.application.api.v1.sales import router as sales_router
 from app.application.api.v1.status_mappings import router as status_mappings_router
+from app.application.api.v1.users import router as users_router
 from fastapi import APIRouter
 
 routers = APIRouter(prefix="/api/v1")
 
+routers.include_router(auth_router, prefix="/auth", tags=["Auth"])
+routers.include_router(users_router, prefix="/users", tags=["Users"])
 routers.include_router(calculations_router, prefix="/calculate", tags=["Calculations"])
 routers.include_router(real_estate_objects_router, prefix="/real-estate-objects", tags=["Real Estate Objects"])
 routers.include_router(pricing_configs_router, prefix="/pricing-configs", tags=["Pricing Configs"])
