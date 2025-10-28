@@ -3,7 +3,7 @@ from typing import Sequence
 from app.core.interfaces.committed_prices_repository import CommittedPricesRepositoryInterface
 from app.infrastructure.postgres.models import CommittedPrices, DistributionConfig, PricingConfig, RealEstateObject
 from app.infrastructure.postgres.session_manager import provide_async_session
-from sqlalchemy import select, update
+from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -16,6 +16,17 @@ class CommittedPricesRepository(CommittedPricesRepositoryInterface):
         await session.commit()
         await session.refresh(price)
         return price
+
+    @provide_async_session
+    async def create_bulk_committed_prices(
+        self, data: list[dict], reo_id: int, session: AsyncSession
+    ) -> Sequence[CommittedPrices]:
+        stmt = insert(CommittedPrices)
+        await session.execute(stmt, data)
+        await session.commit()
+        result = await session.execute(select(CommittedPrices).where(CommittedPrices.reo_id == reo_id))
+        commited_prices = result.scalars().all()
+        return commited_prices
 
     @provide_async_session
     async def get(self, id: int, session: AsyncSession) -> CommittedPrices | None:
@@ -42,10 +53,10 @@ class CommittedPricesRepository(CommittedPricesRepositoryInterface):
 
     @provide_async_session
     async def exists_pricing_config(self, config_id: int, session: AsyncSession) -> bool:
-        result = await session.execute(select(PricingConfig.id).where(DistributionConfig.id == config_id))
+        result = await session.execute(select(PricingConfig.id).where(PricingConfig.id == config_id))
         return result.scalar_one_or_none() is not None
 
     @provide_async_session
     async def exists_reo_id(self, reo_id: int, session: AsyncSession) -> bool:
-        result = await session.execute(select(RealEstateObject.id).where(DistributionConfig.id == reo_id))
+        result = await session.execute(select(RealEstateObject.id).where(RealEstateObject.id == reo_id))
         return result.scalar_one_or_none() is not None

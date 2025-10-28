@@ -9,6 +9,11 @@ class CommittedPricesRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def create_bulk_committed_prices(self, data: list[dict], reo_id: int) -> list[dict]:
+        """Create multiple committed price records in bulk."""
+        raise NotImplementedError
+
+    @abstractmethod
     async def get(self, id: int) -> dict:
         """Get a committed price record by its ID."""
         raise NotImplementedError

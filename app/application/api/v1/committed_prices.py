@@ -1,16 +1,16 @@
 from typing import List
 
 from app.application.api.depends import committed_service_deps, current_user_deps
-from app.core.schemas.committed_price_schemas import CommittedPricesCreate, CommittedPricesResponse
+from app.core.schemas.committed_price_schemas import BulkCommittedPricesCreate, CommittedPricesResponse
 from fastapi import APIRouter
 
 router = APIRouter()
 
 
-@router.post("/", response_model=CommittedPricesResponse)
+@router.post("/bulk", response_model=list[CommittedPricesResponse])
 async def create_committed_price(
-    request: CommittedPricesCreate, committed_service: committed_service_deps, _: current_user_deps
-) -> CommittedPricesResponse:
+    request: BulkCommittedPricesCreate, committed_service: committed_service_deps, _: current_user_deps
+) -> list[CommittedPricesResponse]:
     price = await committed_service.create_committed_price(data=request)
     return price
 

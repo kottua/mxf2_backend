@@ -30,3 +30,7 @@ class CommittedPricesResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BulkCommittedPricesCreate(BaseModel):
+    commited_prices: list[CommittedPricesCreate]
