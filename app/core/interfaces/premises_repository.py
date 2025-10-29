@@ -15,6 +15,11 @@ class PremisesRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_by_reo_id(self, reo_id: int, is_active: bool) -> list[Any]:
+        """Retrieve premises records by REO ID."""
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_all(self) -> list[Any]:
         """Retrieve all premises records."""
         raise NotImplementedError

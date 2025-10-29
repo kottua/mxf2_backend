@@ -23,6 +23,14 @@ class PremisesRepository(PremisesRepositoryInterface):
         return result
 
     @provide_async_session
+    async def get_by_reo_id(self, reo_id: int, is_active: bool, session: AsyncSession) -> Sequence[Premises]:
+        result = await session.execute(
+            select(Premises).where(Premises.reo_id == reo_id, Premises.is_active == is_active)
+        )
+        premises = result.scalars().all()
+        return premises
+
+    @provide_async_session
     async def get_all(self, session: AsyncSession) -> Sequence[Premises]:
         result = await session.execute(select(Premises))
         premises = result.scalars().all()

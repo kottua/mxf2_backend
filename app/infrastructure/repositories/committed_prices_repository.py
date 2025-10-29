@@ -34,6 +34,19 @@ class CommittedPricesRepository(CommittedPricesRepositoryInterface):
         return result
 
     @provide_async_session
+    async def get_by_reo_and_distribution_config(
+        self, reo_id: int, distribution_config_id: int, is_active: bool, session: AsyncSession
+    ) -> Sequence[CommittedPrices]:
+        result = await session.execute(
+            select(CommittedPrices).where(
+                CommittedPrices.reo_id == reo_id,
+                CommittedPrices.distribution_config_id == distribution_config_id,
+                CommittedPrices.is_active == is_active,
+            )
+        )
+        return result.scalars().all()
+
+    @provide_async_session
     async def get_all_committed_prices(self, session: AsyncSession) -> Sequence[CommittedPrices]:
         result = await session.execute(select(CommittedPrices))
         return result.scalars().all()

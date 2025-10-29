@@ -38,3 +38,16 @@ class FileProcessingInterface(ABC):
             Exception: If file format is invalid
         """
         raise NotImplementedError
+
+    @abstractmethod
+    async def write_excel_file(self, df: pd.DataFrame) -> bytes:
+        """
+        Write pandas DataFrame to Excel file and return as bytes.
+
+        Args:
+            df: DataFrame to write
+
+        Returns:
+            Excel file content as bytes
+        """
+        raise NotImplementedError

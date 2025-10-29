@@ -14,7 +14,6 @@ from app.core.services.scoring_calculation_service import ScoringCalculationServ
 from app.core.services.status_mapping_service import StatusMappingService
 from app.core.services.user_service import UserService
 from app.infrastructure.excel.excel_processor import ExcelProcessor
-from app.infrastructure.postgres.models.users import User
 from app.infrastructure.repositories.committed_prices_repository import CommittedPricesRepository
 from app.infrastructure.repositories.distribution_configs_repository import DistributionConfigsRepository
 from app.infrastructure.repositories.income_plans_repository import IncomePlanRepository
@@ -54,12 +53,12 @@ current_user_deps = Annotated[UserOutputSchema, Depends(get_current_user)]
 user_service_deps = Annotated[UserService, Depends(get_user_service)]
 
 
-def get_company_repository() -> CommittedPricesRepository:
+def get_commited_repository() -> CommittedPricesRepository:
     return CommittedPricesRepository()
 
 
 def get_commited_service(
-    repository: CommittedPricesRepository = Depends(get_company_repository),
+    repository: CommittedPricesRepository = Depends(get_commited_repository),
 ) -> CommittedPricesService:
     return CommittedPricesService(repository=repository)
 
@@ -142,8 +141,18 @@ def get_excel_processor() -> ExcelProcessor:
 
 def get_file_processing_service(
     file_processor: ExcelProcessor = Depends(get_excel_processor),
+    distribution_repository: DistributionConfigsRepository = Depends(get_distribution_config_repository),
+    reo_repository: RealEstateObjectRepository = Depends(get_real_estate_object_repository),
+    premises_repository: PremisesRepository = Depends(get_premises_repository),
+    committed_prices_repository: CommittedPricesRepository = Depends(get_commited_repository),
 ) -> FileProcessingService:
-    return FileProcessingService(file_processor=file_processor)
+    return FileProcessingService(
+        file_processor=file_processor,
+        distribution_repository=distribution_repository,
+        reo_repository=reo_repository,
+        premises_repository=premises_repository,
+        committed_prices_repository=committed_prices_repository,
+    )
 
 
 def get_scoring_service(

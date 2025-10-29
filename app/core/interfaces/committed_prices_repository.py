@@ -19,6 +19,13 @@ class CommittedPricesRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_by_reo_and_distribution_config(
+        self, reo_id: int, distribution_config_id: int, is_active: bool
+    ) -> list[dict]:
+        """Get committed price records by REO ID and distribution configuration ID."""
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_all_committed_prices(self) -> list[dict]:
         """Get all committed price records."""
         raise NotImplementedError

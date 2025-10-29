@@ -198,5 +198,20 @@ class PremisesFileSpecificationResponse(BaseModel):
         return instance
 
 
+class PremisesFileSpecificationCreate(PremisesFileSpecificationResponse):
+    actual_price_per_sqm: Optional[float] = Field(alias="Actual price per sqm", default=None)
+    studio: str | bool = Field(alias="Studio", default="No")  # type: ignore[assignment]
+
+    @field_validator("studio", mode="before")
+    @classmethod
+    def convert_studio_to_string(cls, value: bool | str) -> str:
+        """Convert bool studio to "Yes"/"No" string format"""
+        if isinstance(value, bool):
+            return "Yes" if value else "No"
+        return str(value)
+
+    model_config = {"populate_by_name": True}
+
+
 class BulkPremisesCreateRequest(BaseModel):
     premises: List[PremisesCreate]

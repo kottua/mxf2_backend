@@ -8,6 +8,7 @@ from app.core.schemas.premise_schemas import (
 )
 from fastapi import APIRouter, UploadFile
 from starlette import status
+from starlette.responses import Response
 
 router = APIRouter()
 
@@ -66,3 +67,33 @@ async def update_premises(
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_premises(id: int, premises_service: premises_service_deps, _: current_user_deps) -> None:
     await premises_service.delete(id=id)
+
+
+@router.get("/download/excel/{reo_id}/{distribution_config_id}")
+async def download_premises_excel_with_actual_price(
+    reo_id: int,
+    distribution_config_id: int,
+    file_processing_service: file_processing_service_deps,
+    # _: current_user_deps,
+) -> Response:
+    """
+    Download Excel file with premises data and actual_price_per_sqm from committed prices.
+
+    Args:
+        reo_id: Real estate object ID
+        distribution_config_id: Distribution config ID
+
+    Returns:
+        Excel file as downloadable response
+    """
+    excel_bytes = await file_processing_service.generate_excel_with_actual_price(
+        reo_id=reo_id, distribution_config_id=distribution_config_id
+    )
+
+    return Response(
+        content=excel_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename=premises_with_actual_price_reo_{reo_id}_dist_{distribution_config_id}.xlsx"
+        },
+    )

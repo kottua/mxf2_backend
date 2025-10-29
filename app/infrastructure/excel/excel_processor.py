@@ -45,3 +45,24 @@ class ExcelProcessor(FileProcessingInterface):
         """
         if not filename or not filename.endswith((".xlsx", ".xls")):
             raise InvalidFileFormatException(f"File '{filename}' must be in .xlsx or .xls format")
+
+    async def write_excel_file(self, df: pd.DataFrame) -> bytes:
+        """
+        Write pandas DataFrame to Excel file and return as bytes.
+
+        Args:
+            df: DataFrame to write
+
+        Returns:
+            Excel file content as bytes
+
+        Raises:
+            FileReadException: If file cannot be written
+        """
+        try:
+            output = BytesIO()
+            df.to_excel(output, index=False, engine="openpyxl")
+            output.seek(0)
+            return output.getvalue()
+        except Exception as e:
+            raise FileReadException(f"Failed to write Excel file: {str(e)}")
