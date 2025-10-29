@@ -2,7 +2,7 @@ import math
 from datetime import datetime
 from typing import ClassVar, Dict, List, Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class PremisesCreate(BaseModel):
@@ -131,7 +131,7 @@ class PremisesFileSpecificationResponse(BaseModel):
     ]
 
     property_type: str = Field(alias="Property type")
-    premises_id: str = Field(alias="Premises ID")
+    premises_id: Optional[str] = Field(alias="Premises ID", default=None)
     number_of_unit: int = Field(alias="Number of unit")
     number: int = Field(alias="Number")
     entrance: int = Field(alias="Entrance")
@@ -178,6 +178,13 @@ class PremisesFileSpecificationResponse(BaseModel):
             return False
         except ValueError:
             raise ValueError(f"Invalid boolean format: '{value}'. Expected Yes/No or 1/0 or true/false or да/нет.")
+
+    @model_validator(mode="after")
+    def generate_premises_id(self) -> "PremisesFileSpecificationResponse":
+        """Generate premises_id if it's None"""
+        if not self.premises_id:
+            self.premises_id = f"SV/A/{self.floor}/{self.number_of_unit}/{self.layout_type}/{self.number}"
+        return self
 
     @classmethod
     def custom_model_validate(cls, row: dict) -> "PremisesFileSpecificationResponse":
