@@ -18,8 +18,8 @@ class PricingConfigRepository(PricingConfigRepositoryInterface):
         return pricing_config
 
     @provide_async_session
-    async def get(self, plan_id: int, session: AsyncSession) -> PricingConfig | None:
-        result = await session.get(PricingConfig, plan_id)
+    async def get(self, config_id: int, session: AsyncSession) -> PricingConfig | None:
+        result = await session.get(PricingConfig, config_id)
         return result
 
     @provide_async_session
