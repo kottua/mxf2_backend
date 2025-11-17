@@ -102,11 +102,11 @@ class CalculateActualCosts(PipelineStep):
         Extract current price per square meter from pricing config.
         """
         try:
-            if not context.pricing_configs or len(context.pricing_configs) == 0:
-                logger.error("No pricing configs found")
+            if not context.pricing_config:
+                logger.error("No pricing config found")
                 return 0.0
 
-            content = context.pricing_configs[-1].content
+            content = context.pricing_config.content
             if not content:
                 logger.error("Pricing config content is empty")
                 return 0.0

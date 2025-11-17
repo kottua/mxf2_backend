@@ -23,11 +23,11 @@ class FilterAndScoreFlats(PipelineStep):
             return context
 
         # Check if pricing config is valid
-        if not context.pricing_configs or not context.pricing_configs[-1].content:
+        if not context.pricing_config or not context.pricing_config.content:
             logger.error("Invalid pricing config")
             return context
 
-        config = context.pricing_configs[-1]
+        config = context.pricing_config
         if (
             not config.content.get("dynamicConfig")
             or not config.content.get("staticConfig")

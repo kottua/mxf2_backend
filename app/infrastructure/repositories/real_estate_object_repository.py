@@ -1,11 +1,11 @@
 from typing import Sequence
 
 from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
-from app.infrastructure.postgres.models import Premises, PricingConfig, RealEstateObject
+from app.infrastructure.postgres.models import Premises, RealEstateObject
 from app.infrastructure.postgres.session_manager import provide_async_session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, with_loader_criteria
+from sqlalchemy.orm import joinedload, selectinload, with_loader_criteria
 
 
 class RealEstateObjectRepository(RealEstateObjectRepositoryInterface):
@@ -42,15 +42,15 @@ class RealEstateObjectRepository(RealEstateObjectRepositoryInterface):
             .options(
                 selectinload(RealEstateObject.premises),
                 with_loader_criteria(Premises, Premises.is_active == True),
-                selectinload(RealEstateObject.pricing_configs),
-                with_loader_criteria(PricingConfig, PricingConfig.is_active == True),
+                joinedload(RealEstateObject.pricing_config),
                 selectinload(RealEstateObject.committed_prices),
                 selectinload(RealEstateObject.income_plans),
                 selectinload(RealEstateObject.status_mappings),
             )
         )
         result = await session.execute(stmt)
-        return result.scalar_one_or_none()
+        reo = result.scalar_one_or_none()
+        return reo
 
     @provide_async_session
     async def get_all(self, user_id: int, session: AsyncSession) -> Sequence[RealEstateObject]:

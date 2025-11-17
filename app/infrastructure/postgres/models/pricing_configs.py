@@ -9,11 +9,11 @@ class PricingConfig(Base):
     __tablename__ = "pricing_configs"
 
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    reo_id: Mapped[int] = mapped_column(Integer, ForeignKey("real_estate_objects.id"), nullable=False)
+    reo_id: Mapped[int] = mapped_column(Integer, ForeignKey("real_estate_objects.id"), nullable=False, unique=True)
     content: Mapped[dict] = mapped_column(JSON, nullable=False)
 
     # Relationships
-    real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="pricing_configs")
+    real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="pricing_config")
     committed_prices: Mapped[List["CommittedPrices"]] = relationship(back_populates="pricing_config")
 
     __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

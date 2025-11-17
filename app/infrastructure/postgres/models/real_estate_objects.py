@@ -20,7 +20,9 @@ class RealEstateObject(Base):
     # Relationships
     user: Mapped["User"] = relationship(back_populates="real_estate_objects")
     premises: Mapped[List["Premises"]] = relationship(back_populates="real_estate_object")
-    pricing_configs: Mapped[List["PricingConfig"]] = relationship(back_populates="real_estate_object")
+    pricing_config: Mapped[Optional["PricingConfig"]] = relationship(
+        back_populates="real_estate_object", uselist=False
+    )
     committed_prices: Mapped[List["CommittedPrices"]] = relationship(back_populates="real_estate_object")
     income_plans: Mapped[List["IncomePlan"]] = relationship(back_populates="real_estate_object")
     status_mappings: Mapped[List["StatusMapping"]] = relationship(back_populates="real_estate_object")

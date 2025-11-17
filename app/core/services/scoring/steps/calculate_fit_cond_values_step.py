@@ -26,13 +26,13 @@ class CalculateFitCondValues(PipelineStep):
 
         # Get current price per square meter from pricing config
         static_config = self._get_current_price_per_sqm(context)
-        current_price_per_sqm = static_config.get("current_price_per_sqm", 0.0)
+        onboarding_current_price_per_sqm = static_config.get("onboarding_current_price_per_sqm", 0.0)
         minimum_liq_refusal_price = static_config.get("minimum_liq_refusal_price", 0.0)
         maximum_liq_refusal_price = static_config.get("maximum_liq_refusal_price", 0.0)
 
         # Calculate b_rate_net and t_rate_net
-        b_rate_net = 1 - minimum_liq_refusal_price / current_price_per_sqm
-        t_rate_net = maximum_liq_refusal_price / current_price_per_sqm - 1
+        b_rate_net = 1 - minimum_liq_refusal_price / onboarding_current_price_per_sqm
+        t_rate_net = maximum_liq_refusal_price / onboarding_current_price_per_sqm - 1
 
         # Get normalized running total values
         sp_mixed_rt_norm = [premise.calculation.normalized_running_total for premise in context.premises]
@@ -104,24 +104,24 @@ class CalculateFitCondValues(PipelineStep):
         Extract current price per square meter from pricing config.
         """
         initial_price_data = {
-            "current_price_per_sqm": 0.0,
+            "onboarding_current_price_per_sqm": 0.0,
             "minimum_liq_refusal_price": 0.0,
             "maximum_liq_refusal_price": 0.0,
         }
 
         try:
-            if not context.pricing_configs or len(context.pricing_configs) == 0:
-                logger.error("No pricing configs found")
+            if not context.pricing_config:
+                logger.error("No pricing config found")
                 return initial_price_data
 
-            content = context.pricing_configs[-1].content
+            content = context.pricing_config.content
 
             static_config = content.get("staticConfig", {})
 
-            current_price_per_sqm = static_config.get("current_price_per_sqm", None)
-            if current_price_per_sqm is None:
-                logger.error("current_price_per_sqm not found in static config")
-                initial_price_data["current_price_per_sqm"] = 0.0
+            onboarding_current_price_per_sqm = static_config.get("onboarding_current_price_per_sqm", None)
+            if onboarding_current_price_per_sqm is None:
+                logger.error("onboarding_current_price_per_sqm not found in static config")
+                initial_price_data["onboarding_current_price_per_sqm"] = 0.0
 
             maximum_liq_refusal_price = static_config.get("maximum_liq_refusal_price", None)
             if maximum_liq_refusal_price is None:
@@ -134,7 +134,7 @@ class CalculateFitCondValues(PipelineStep):
                 initial_price_data["minimum_liq_refusal_price"] = 0.0
 
             return {
-                "current_price_per_sqm": float(current_price_per_sqm),
+                "onboarding_current_price_per_sqm": float(onboarding_current_price_per_sqm),
                 "minimum_liq_refusal_price": float(minimum_liq_refusal_price),
                 "maximum_liq_refusal_price": float(maximum_liq_refusal_price),
             }

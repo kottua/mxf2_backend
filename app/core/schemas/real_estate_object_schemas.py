@@ -63,7 +63,7 @@ class RealEstateObjectFullResponse(BaseModel):
     custom_fields: Optional[dict]
 
     premises: list[PremisesResponse]
-    pricing_configs: list[PricingConfigResponse]
+    pricing_config: Optional[PricingConfigResponse]
     committed_prices: list[CommittedPricesResponse]
     income_plans: list[IncomePlanResponse]
     status_mappings: list[StatusMappingResponse]
