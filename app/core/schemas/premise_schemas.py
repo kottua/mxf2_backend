@@ -17,21 +17,61 @@ class PremisesCreate(BaseModel):
     full_price: Optional[float] = None
     total_area_m2: float
     estimated_area_m2: float
-    price_per_meter: Optional[float] = None
-    number_of_rooms: Optional[int] = None
-    living_area_m2: Optional[float] = None
-    kitchen_area_m2: Optional[float] = None
+    price_per_meter: Optional[float] = 0.0
+    number_of_rooms: Optional[int] = 0
+    living_area_m2: Optional[float] = 0.0
+    kitchen_area_m2: Optional[float] = 0.0
     view_from_window: Optional[str] = None
-    number_of_levels: Optional[int] = None
-    number_of_loggias: Optional[int] = None
-    number_of_balconies: Optional[int] = None
-    number_of_bathrooms_with_toilets: Optional[int] = None
-    number_of_separate_bathrooms: Optional[int] = None
-    number_of_terraces: Optional[int] = None
+    number_of_levels: Optional[int] = 0
+    number_of_loggias: Optional[int] = 0
+    number_of_balconies: Optional[int] = 0
+    number_of_bathrooms_with_toilets: Optional[int] = 0
+    number_of_separate_bathrooms: Optional[int] = 0
+    number_of_terraces: Optional[int] = 0
     studio: bool = False
     status: str
     sales_amount: Optional[float] = None
     customcontent: Optional[Dict] = None
+
+    @model_validator(mode="after")
+    def set_defaults_and_calculate_price(self) -> "PremisesCreate":
+        """Set default values for None fields and calculate price_per_meter if needed."""
+        # Convert None to default values for numeric fields
+        if self.price_per_meter is None:
+            # Try to calculate from full_price and total_area_m2
+            if self.full_price is not None and self.total_area_m2 is not None and self.total_area_m2 > 0:
+                self.price_per_meter = self.full_price / self.total_area_m2
+            else:
+                self.price_per_meter = 0.0
+
+        if self.number_of_rooms is None:
+            self.number_of_rooms = 0
+
+        if self.living_area_m2 is None:
+            self.living_area_m2 = 0.0
+
+        if self.kitchen_area_m2 is None:
+            self.kitchen_area_m2 = 0.0
+
+        if self.number_of_levels is None:
+            self.number_of_levels = 0
+
+        if self.number_of_loggias is None:
+            self.number_of_loggias = 0
+
+        if self.number_of_balconies is None:
+            self.number_of_balconies = 0
+
+        if self.number_of_bathrooms_with_toilets is None:
+            self.number_of_bathrooms_with_toilets = 0
+
+        if self.number_of_separate_bathrooms is None:
+            self.number_of_separate_bathrooms = 0
+
+        if self.number_of_terraces is None:
+            self.number_of_terraces = 0
+
+        return self
 
     class Config:
         from_attributes = True

@@ -13,9 +13,13 @@ from starlette.responses import Response
 router = APIRouter()
 
 
-@router.post("/upload/specification", response_model=list[PremisesFileSpecificationResponse])
+@router.post("/upload/specification/{reo_id}", response_model=list[PremisesFileSpecificationResponse])
 async def upload_premises_specification(
-    file: UploadFile, file_processing_service: file_processing_service_deps, _: current_user_deps
+    reo_id: int,
+    file: UploadFile,
+    file_processing_service: file_processing_service_deps,
+    premises_service: premises_service_deps,
+    current_user: current_user_deps,
 ) -> list[PremisesFileSpecificationResponse]:
     # Read file content
     file_content = await file.read()
@@ -24,6 +28,19 @@ async def upload_premises_specification(
     premises_data = await file_processing_service.process_specification(
         file_content=file_content, filename=file.filename or "unknown"
     )
+    premises_create_list = []
+    for spec in premises_data:
+        spec_dict = spec.model_dump(by_alias=False)
+        # Convert entrance from int to str
+        if isinstance(spec_dict.get("entrance"), int):
+            spec_dict["entrance"] = str(spec_dict["entrance"])
+        # Add reo_id from endpoint parameter
+        spec_dict["reo_id"] = reo_id
+
+        premises_create_list.append(PremisesCreate(**spec_dict))
+
+    bulk_request = BulkPremisesCreateRequest(premises=premises_create_list)
+    await premises_service.create_bulk_premises(data=bulk_request, user=current_user)
 
     return premises_data
 
