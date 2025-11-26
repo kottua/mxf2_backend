@@ -1,7 +1,7 @@
 from app.core.schemas.distribution_config_schemas import DistributionConfigResponse
 from app.core.schemas.premise_schemas import PremisesResponse
 from app.core.schemas.real_estate_object_schemas import RealEstateObjectFullResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class PremisesContext(BaseModel):
@@ -33,6 +33,20 @@ class PremisesWithCalculation(PremisesResponse):
     """Extended PremisesResponse with calculation fields"""
 
     calculation: PremisesContext = PremisesContext()
+
+    @model_validator(mode="after")
+    def apply_sold_price_logic(self) -> "PremisesWithCalculation":
+        if self.status == "sold":
+
+            if self.full_price is not None:
+                self.full_price = 0.0
+
+            if self.sales_amount is not None:
+                self.sales_amount = 0.0
+
+            self.calculation.actual_price_per_sqm = 0.0
+
+        return self
 
 
 class RealEstateObjectWithCalculations(RealEstateObjectFullResponse):
