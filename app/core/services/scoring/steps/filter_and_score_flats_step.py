@@ -14,14 +14,6 @@ class FilterAndScoreFlats(PipelineStep):
     def handle(self, context: RealEstateObjectWithCalculations) -> RealEstateObjectWithCalculations:
         updated_premises = []
 
-        # Get available premises only
-        available_premises = [p for p in context.premises if p.status == "available"]
-
-        if not available_premises:
-            logger.warning("No available premises found")
-            context.premises = []
-            return context
-
         # Check if pricing config is valid
         if not context.pricing_configs or not context.pricing_configs[-1].content:
             logger.error("Invalid pricing config")
@@ -37,13 +29,16 @@ class FilterAndScoreFlats(PipelineStep):
             return context
 
         # Process each available premise
-        for premise in available_premises:
-            try:
-                updated_premise = self.calculate_scoring(premise, context.premises, config)
-                updated_premises.append(updated_premise)
-            except Exception as e:
-                logger.error(f"Error calculating scoring for premise ID {premise.id}: {e}")
-                continue
+        for premise in context.premises:
+            if premise.status == "sold":
+                updated_premises.append(premise)
+            else:
+                try:
+                    updated_premise = self.calculate_scoring(premise, context.premises, config)
+                    updated_premises.append(updated_premise)
+                except Exception as e:
+                    logger.error(f"Error calculating scoring for premise ID {premise.id}: {e}")
+                    continue
 
         # Sort by scoring in ascending order
         updated_premises.sort(key=lambda p: p.calculation.scoring)
