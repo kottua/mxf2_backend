@@ -1,5 +1,13 @@
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class AgentConfig(BaseSettings):
+    MODEL: str = Field(..., description="Имя модели LLM")
+    TOKEN: SecretStr = Field(..., description="API ключ")
+    TEMPERATURE: float = Field(1.0, ge=0.0, le=2.0)
+
+    model_config = SettingsConfigDict(env_file=".env", env_prefix="GPT_", extra="ignore")
 
 
 class TokenSettings(BaseSettings):
@@ -36,6 +44,7 @@ class Settings(BaseSettings):
 
     database: DatabaseSettings = DatabaseSettings()
     token: TokenSettings = TokenSettings()
+    agent: AgentConfig = AgentConfig()
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

@@ -13,6 +13,7 @@ from app.core.services.sales_service import SalesService
 from app.core.services.scoring_calculation_service import ScoringCalculationService
 from app.core.services.status_mapping_service import StatusMappingService
 from app.core.services.user_service import UserService
+from app.infrastructure.agents.agent_manager import AgentManager
 from app.infrastructure.excel.excel_processor import ExcelProcessor
 from app.infrastructure.repositories.committed_prices_repository import CommittedPricesRepository
 from app.infrastructure.repositories.distribution_configs_repository import DistributionConfigsRepository
@@ -23,6 +24,7 @@ from app.infrastructure.repositories.real_estate_object_repository import RealEs
 from app.infrastructure.repositories.sales_repository import SalesRepository
 from app.infrastructure.repositories.status_mapping_repository import StatusMappingRepository
 from app.infrastructure.repositories.user_repository import UserRepository
+from app.settings import AgentConfig, settings
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -162,6 +164,17 @@ def get_scoring_service(
     return ScoringCalculationService(
         reo_repository=reo_repository, distribution_config_repository=distribution_config_repository
     )
+
+
+def get_agent_config() -> AgentConfig:
+    return settings.agent
+
+
+def get_agent_manager(config: AgentConfig = Depends(get_agent_config)) -> AgentManager:
+    return AgentManager(config=config)
+
+
+agent_manager_deps = Annotated[AgentManager, Depends(get_agent_manager)]
 
 
 committed_service_deps = Annotated[CommittedPricesService, Depends(get_commited_service)]
