@@ -40,6 +40,8 @@ def _include_error_handlers(app: FastAPI) -> None:
         exceptions.FileProcessingException, error_handlers.handle_file_processing_exception  # type: ignore
     )
     app.add_exception_handler(exceptions.InvalidCredentials, error_handlers.handle_invalid_credentials)  # type: ignore
+    app.add_exception_handler(exceptions.AgentNotFound, error_handlers.handle_agent_not_found)  # type: ignore
+    app.add_exception_handler(exceptions.AgentExecutionError, error_handlers.handle_agent_execution_error)  # type: ignore
 
 
 def create_app() -> FastAPI:

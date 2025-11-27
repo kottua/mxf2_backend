@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
 
-class FlatLabelItem(BaseModel):
+class FlatPriorityItem(BaseModel):
     name: str
-    value: str
+    value: list[str]
     priority: int
 
 
 class BestFlatLabelResponse(BaseModel):
-    number: list[FlatLabelItem]
+    number: list[FlatPriorityItem]

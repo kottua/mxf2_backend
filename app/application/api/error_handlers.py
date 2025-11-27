@@ -35,3 +35,11 @@ def handle_file_processing_exception(_: Request, e: exceptions.FileProcessingExc
 
 def handle_invalid_credentials(_: Request, e: exceptions.InvalidCredentials) -> JSONResponse:
     return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+def handle_agent_not_found(_: Request, e: exceptions.AgentNotFound) -> JSONResponse:
+    return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_404_NOT_FOUND)
+
+
+def handle_agent_execution_error(_: Request, e: exceptions.AgentExecutionError) -> JSONResponse:
+    return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

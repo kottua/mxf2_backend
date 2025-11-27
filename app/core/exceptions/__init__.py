@@ -1,4 +1,7 @@
 from app.core.exceptions.domain import (
+    AgentException,
+    AgentExecutionError,
+    AgentNotFound,
     DataValidationException,
     FileProcessingException,
     FileReadException,
@@ -20,4 +23,7 @@ __all__ = [
     "DataValidationException",
     "FileProcessingException",
     "InvalidCredentials",
+    "AgentException",
+    "AgentExecutionError",
+    "AgentNotFound",
 ]

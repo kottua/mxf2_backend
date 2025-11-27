@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from app.core.schemas.user_schemas import UserOutputSchema
+from app.core.services.agent_service import AgentService
 from app.core.services.auth_service import AuthService
 from app.core.services.committed_price_service import CommittedPricesService
 from app.core.services.distribution_config_service import DistributionConfigsService
@@ -175,6 +176,21 @@ def get_agent_manager(config: AgentConfig = Depends(get_agent_config)) -> AgentM
 
 
 agent_manager_deps = Annotated[AgentManager, Depends(get_agent_manager)]
+
+
+def get_agent_service(
+    agent_manager: AgentManager = Depends(get_agent_manager),
+    real_estate_object_service: RealEstateObjectService = Depends(get_real_estate_object_service),
+    pricing_config_service: PricingConfigService = Depends(get_pricing_config_service),
+) -> AgentService:
+    return AgentService(
+        agent_manager=agent_manager,
+        real_estate_object_service=real_estate_object_service,
+        pricing_config_service=pricing_config_service,
+    )
+
+
+agent_service_deps = Annotated[AgentService, Depends(get_agent_service)]
 
 
 committed_service_deps = Annotated[CommittedPricesService, Depends(get_commited_service)]
