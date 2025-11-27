@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from app.core.schemas.pricing_config_schemas import PricingConfigCreate, PricingConfigUpdate
+from app.core.schemas.pricing_config_schemas import PricingConfigCreate
 
 
 class PricingConfigRepositoryInterface(ABC):
@@ -27,7 +27,7 @@ class PricingConfigRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, pricing_config: Any, data: PricingConfigUpdate) -> Any:
+    async def update(self, pricing_config: Any, data: dict) -> Any:
         """Update an existing pricing config."""
         raise NotImplementedError
 

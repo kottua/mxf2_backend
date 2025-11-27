@@ -1,3 +1,4 @@
+from app.application.api.v1.agents import router as agents_router
 from app.application.api.v1.auth import router as auth_router
 from app.application.api.v1.calculations import router as calculations_router
 from app.application.api.v1.committed_prices import router as committed_prices_router
@@ -24,3 +25,4 @@ routers.include_router(sales_router, prefix="/sales", tags=["Sales"])
 routers.include_router(committed_prices_router, prefix="/committed-prices", tags=["Committed Prices"])
 routers.include_router(income_plans_router, prefix="/income-plans", tags=["Income Plans"])
 routers.include_router(status_mappings_router, prefix="/status-mappings", tags=["Status Mappings"])
+routers.include_router(agents_router, prefix="/agents", tags=["Agents"])

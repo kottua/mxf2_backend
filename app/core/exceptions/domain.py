@@ -60,3 +60,28 @@ class DataValidationException(FileProcessingException):
         self.error_details = error_details
         message = f"Validation error in row {row_number}: {error_details}"
         super().__init__(message)
+
+
+class AgentException(Exception):
+    """Base exception for agent-related errors"""
+
+    def __init__(self, message: Optional[str] = "Agent error occurred") -> None:
+        super().__init__(message)
+
+
+class AgentNotFound(AgentException):
+    """Raised when agent is not found or not registered"""
+
+    def __init__(self, agent_id: str) -> None:
+        message = f"Agent with id '{agent_id}' not found. Please register the agent first."
+        super().__init__(message)
+
+
+class AgentExecutionError(AgentException):
+    """Raised when agent execution fails"""
+
+    def __init__(self, agent_id: str, reason: Optional[str] = None) -> None:
+        message = f"Failed to run agent '{agent_id}'"
+        if reason:
+            message += f": {reason}"
+        super().__init__(message)

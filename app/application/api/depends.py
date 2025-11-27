@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from app.core.schemas.user_schemas import UserOutputSchema
+from app.core.services.agent_service import AgentService
 from app.core.services.auth_service import AuthService
 from app.core.services.committed_price_service import CommittedPricesService
 from app.core.services.distribution_config_service import DistributionConfigsService
@@ -13,6 +14,7 @@ from app.core.services.sales_service import SalesService
 from app.core.services.scoring_calculation_service import ScoringCalculationService
 from app.core.services.status_mapping_service import StatusMappingService
 from app.core.services.user_service import UserService
+from app.infrastructure.agents.agent_manager import AgentManager
 from app.infrastructure.excel.excel_processor import ExcelProcessor
 from app.infrastructure.repositories.committed_prices_repository import CommittedPricesRepository
 from app.infrastructure.repositories.distribution_configs_repository import DistributionConfigsRepository
@@ -23,6 +25,7 @@ from app.infrastructure.repositories.real_estate_object_repository import RealEs
 from app.infrastructure.repositories.sales_repository import SalesRepository
 from app.infrastructure.repositories.status_mapping_repository import StatusMappingRepository
 from app.infrastructure.repositories.user_repository import UserRepository
+from app.settings import AgentConfig, settings
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -162,6 +165,32 @@ def get_scoring_service(
     return ScoringCalculationService(
         reo_repository=reo_repository, distribution_config_repository=distribution_config_repository
     )
+
+
+def get_agent_config() -> AgentConfig:
+    return settings.agent
+
+
+def get_agent_manager(config: AgentConfig = Depends(get_agent_config)) -> AgentManager:
+    return AgentManager(config=config)
+
+
+agent_manager_deps = Annotated[AgentManager, Depends(get_agent_manager)]
+
+
+def get_agent_service(
+    agent_manager: AgentManager = Depends(get_agent_manager),
+    real_estate_object_service: RealEstateObjectService = Depends(get_real_estate_object_service),
+    pricing_config_service: PricingConfigService = Depends(get_pricing_config_service),
+) -> AgentService:
+    return AgentService(
+        agent_manager=agent_manager,
+        real_estate_object_service=real_estate_object_service,
+        pricing_config_service=pricing_config_service,
+    )
+
+
+agent_service_deps = Annotated[AgentService, Depends(get_agent_service)]
 
 
 committed_service_deps = Annotated[CommittedPricesService, Depends(get_commited_service)]
