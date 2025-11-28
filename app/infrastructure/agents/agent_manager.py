@@ -65,6 +65,7 @@ class AgentManager:
         """Регистрирует всех агентов в системе"""
 
         self._register_best_flat_label_agent()
+        self._register_best_flat_floor_agent()
 
     def _register_best_flat_label_agent(self) -> None:
         """Регистрирует тестового агента для определения лучшей квартиры"""
@@ -72,5 +73,14 @@ class AgentManager:
             agent_id=AgentID.BEST_FLAT_LABEL,
             system_prompt=prompt_manager.SYSTEM_PROMPT_BEST_FLAT_LABEL,
             response_model=agents_schemas.BestFlatLabelResponse,
+        )
+        self.register_agent(definition)
+
+    def _register_best_flat_floor_agent(self) -> None:
+        """Регистрирует тестового агента для определения лучшего этажа квартиры"""
+        definition = AgentDefinition(
+            agent_id=AgentID.BEST_FLAT_FLOOR,
+            system_prompt=prompt_manager.SYSTEM_PROMPT_BEST_FLAT_FLOOR,
+            response_model=agents_schemas.BestFlatFloorResponse,
         )
         self.register_agent(definition)

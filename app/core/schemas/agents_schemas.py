@@ -9,3 +9,7 @@ class FlatPriorityItem(BaseModel):
 
 class BestFlatLabelResponse(BaseModel):
     number: list[FlatPriorityItem]
+
+
+class BestFlatFloorResponse(BaseModel):
+    floor: list[FlatPriorityItem]

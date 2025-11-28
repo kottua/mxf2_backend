@@ -41,3 +41,16 @@ class AgentService:
         result_dict = await asyncio.to_thread(self._run_blocking_agent, AgentID.BEST_FLAT_LABEL, user_prompt)
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+
+    async def run_best_floor_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+
+        reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
+
+        floor_numbers = sorted({premise.floor for premise in reo.premises})
+        user_prompt = prompt_manager.USER_PROMPT_BEST_FLAT_FLOOR.format(
+            latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class, floors=floor_numbers
+        )
+
+        result_dict = await asyncio.to_thread(self._run_blocking_agent, AgentID.BEST_FLAT_FLOOR, user_prompt)
+
+        await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)

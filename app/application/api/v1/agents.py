@@ -18,3 +18,18 @@ async def get_best_flat_label(
     """
     background_tasks.add_task(agent_service.run_best_flat_label_agent, reo_id=reo_id, user=current_user)
     return {"status": "processing"}
+
+
+@router.get("/best-floor/{reo_id}", status_code=status.HTTP_200_OK)
+async def get_best_floor(
+    reo_id: int,
+    background_tasks: BackgroundTasks,
+    agent_service: agent_service_deps,
+    current_user: current_user_deps,
+) -> dict:
+    """
+    Запускает агента для определения лучшего этажа и сохраняет результат в PricingConfig
+
+    """
+    background_tasks.add_task(agent_service.run_best_floor_agent, reo_id=reo_id, user=current_user)
+    return {"status": "processing"}

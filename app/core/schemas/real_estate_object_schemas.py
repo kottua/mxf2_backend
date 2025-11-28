@@ -6,6 +6,7 @@ from app.core.schemas.income_plan_schemas import IncomePlanResponse
 from app.core.schemas.premise_schemas import PremisesResponse
 from app.core.schemas.pricing_config_schemas import PricingConfigResponse
 from app.core.schemas.status_mapping_schemas import StatusMappingResponse
+from app.core.utils.enums import CurrencyEnum, PropertyClassEnum
 from pydantic import BaseModel, Field
 
 
@@ -13,7 +14,8 @@ class RealEstateObjectCreate(BaseModel):
     name: str
     lon: Optional[float] = Field(None, ge=-180, le=180)
     lat: Optional[float] = Field(None, ge=-90, le=90)
-    curr: Optional[str] = None
+    curr: Optional[CurrencyEnum] = CurrencyEnum.UAH
+    property_class: Optional[PropertyClassEnum] = PropertyClassEnum.ECONOMY
     url: Optional[str] = None
     custom_fields: Optional[dict] = None
 
@@ -25,7 +27,8 @@ class RealEstateObjectUpdate(BaseModel):
     name: Optional[str] = None
     lon: Optional[float] = Field(None, ge=-180, le=180)
     lat: Optional[float] = Field(None, ge=-90, le=90)
-    curr: Optional[str] = None
+    curr: Optional[CurrencyEnum] = CurrencyEnum.UAH
+    property_class: Optional[PropertyClassEnum] = PropertyClassEnum.ECONOMY
     url: Optional[str] = None
     is_deleted: Optional[bool] = None
     custom_fields: Optional[dict] = None
@@ -39,7 +42,8 @@ class RealEstateObjectResponse(BaseModel):
     name: str
     lon: Optional[float]
     lat: Optional[float]
-    curr: Optional[str]
+    curr: Optional[CurrencyEnum]
+    property_class: Optional[PropertyClassEnum]
     url: Optional[str]
     created_at: datetime
     updated_at: datetime
@@ -55,7 +59,8 @@ class RealEstateObjectFullResponse(BaseModel):
     name: str
     lon: Optional[float]
     lat: Optional[float]
-    curr: Optional[str]
+    curr: Optional[CurrencyEnum]
+    property_class: Optional[PropertyClassEnum]
     url: Optional[str]
     created_at: datetime
     updated_at: datetime
