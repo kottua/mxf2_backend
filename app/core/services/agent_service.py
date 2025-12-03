@@ -7,6 +7,7 @@ from app.core.services.real_estate_object_service import RealEstateObjectService
 from app.infrastructure.agents.agent_constants import AgentID
 from app.infrastructure.agents.agent_manager import AgentManager
 from app.infrastructure.agents.prompt_manager import prompt_manager
+from loguru import logger
 
 
 class AgentService:
@@ -32,6 +33,7 @@ class AgentService:
         return result.model_dump()
 
     async def run_best_flat_label_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+        logger.info(f"Running best label agent for REO ID: {reo_id}")
 
         reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
 
@@ -41,8 +43,10 @@ class AgentService:
         result_dict = await asyncio.to_thread(self._run_blocking_agent, AgentID.BEST_FLAT_LABEL, user_prompt)
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info(f"Finished running best label agent for REO ID: {reo_id}")
 
     async def run_best_floor_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+        logger.info(f"Running best floor agent for REO ID: {reo_id}")
 
         reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
 
@@ -54,3 +58,4 @@ class AgentService:
         result_dict = await asyncio.to_thread(self._run_blocking_agent, AgentID.BEST_FLAT_FLOOR, user_prompt)
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info(f"Finished running best floor agent for REO ID: {reo_id}")

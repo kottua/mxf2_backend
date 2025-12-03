@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class FlatPriorityItem(BaseModel):
     name: str
-    value: list[str]
+    values: list[str]
     priority: int
 
 
