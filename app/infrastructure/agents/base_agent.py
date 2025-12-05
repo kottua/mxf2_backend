@@ -1,6 +1,7 @@
 from typing import Type
 
 import instructor
+from app.core.schemas.agents_schemas import ImageData
 from app.settings import AgentConfig
 from openai import OpenAI
 from pydantic import BaseModel
@@ -25,10 +26,14 @@ class BaseAgent:
     def system_prompt(self, new_system_prompt: str) -> None:
         self._system_prompt = new_system_prompt
 
-    def run(self, user_input: str) -> BaseModel:
+    def run(self, user_input: str, images: list[ImageData] | None = None) -> BaseModel:
+        content = [{"type": "text", "text": user_input}]
+        for image in images or []:
+            content.extend(image.to_agent_payload())
+
         messages = [
             {"role": "system", "content": self._system_prompt},
-            {"role": "user", "content": user_input},
+            {"role": "user", "content": content},
         ]
 
         conversation_result = self.client.chat.completions.create(
