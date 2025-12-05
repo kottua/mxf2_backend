@@ -1,6 +1,7 @@
 import asyncio
 
 from app.core.exceptions import AgentExecutionError, AgentNotFound
+from app.core.schemas.agents_schemas import ImageData
 from app.core.schemas.user_schemas import UserOutputSchema
 from app.core.services.pricing_config_service import PricingConfigService
 from app.core.services.real_estate_object_service import RealEstateObjectService
@@ -21,11 +22,11 @@ class AgentService:
         self.real_estate_object_service = real_estate_object_service
         self.pricing_config_service = pricing_config_service
 
-    def _run_blocking_agent(self, agent_id: AgentID, user_prompt: str) -> dict:
+    def _run_blocking_agent(self, agent_id: AgentID, user_prompt: str, images: list[ImageData] | None = None) -> dict:
         if self.agent_manager.get_agent(agent_id) is None:
             raise AgentNotFound(agent_id=agent_id)
 
-        result = self.agent_manager.run_agent(agent_id, user_input=user_prompt)
+        result = self.agent_manager.run_agent(agent_id, user_input=user_prompt, images=images)
 
         if result is None:
             raise AgentExecutionError(agent_id=agent_id)
@@ -59,3 +60,18 @@ class AgentService:
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
         logger.info(f"Finished running best floor agent for REO ID: {reo_id}")
+
+    async def run_layout_evaluator_agent(self, reo_id: int, user: UserOutputSchema, images: list[ImageData]) -> None:
+        logger.info("Running layout evaluator agent")
+        reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
+
+        user_prompt = prompt_manager.USER_PROMPT_LAYOUT_EVALUATOR.format(
+            latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class
+        )
+
+        result_dict = await asyncio.to_thread(
+            self._run_blocking_agent, AgentID.LAYOUT_EVALUATOR, user_prompt=user_prompt, images=images
+        )
+
+        await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info("Finished running layout evaluator agent")

@@ -1,6 +1,7 @@
 from typing import Any, Type
 
 from app.core.schemas import agents_schemas
+from app.core.schemas.agents_schemas import ImageData
 from app.infrastructure.agents.agent_constants import AgentID
 from app.infrastructure.agents.base_agent import BaseAgent
 from app.infrastructure.agents.prompt_manager import prompt_manager
@@ -34,7 +35,7 @@ class AgentManager:
         self.config = config
         self._agents: dict[str, BaseAgent] = {}
         self._agent_definitions: dict[str, AgentDefinition] = {}
-        self._register_all_agents()
+        self.__register_all_agents()
 
     def register_agent(self, definition: AgentDefinition) -> None:
         """Регистрирует нового агента"""
@@ -50,25 +51,30 @@ class AgentManager:
         """Получает агента по ID"""
         return self._agents.get(agent_id)
 
-    def run_agent(self, agent_id: str, user_input: str) -> BaseModel | None:
+    def run_agent(self, agent_id: str, user_input: str, images: list[ImageData] | None = None) -> BaseModel | None:
         """Запускает агента с переданным user_input"""
         agent = self.get_agent(agent_id)
         if agent is None:
             return None
-        return agent.run(user_input)
+        return agent.run(user_input, images=images)
 
     def list_agents(self) -> list[str]:
         """Возвращает список всех зарегистрированных агентов"""
         return list(self._agents.keys())
 
-    def _register_all_agents(self) -> None:
+    def __register_all_agents(self) -> None:
         """Регистрирует всех агентов в системе"""
+        methods = [
+            getattr(self, name)
+            for name in dir(self)
+            if name.startswith("_register_") and callable(getattr(self, name))
+        ]
 
-        self._register_best_flat_label_agent()
-        self._register_best_flat_floor_agent()
+        for method in methods:
+            method()
 
     def _register_best_flat_label_agent(self) -> None:
-        """Регистрирует тестового агента для определения лучшей квартиры"""
+        """Регистрирует агента для определения лучшей квартиры"""
         definition = AgentDefinition(
             agent_id=AgentID.BEST_FLAT_LABEL,
             system_prompt=prompt_manager.SYSTEM_PROMPT_BEST_FLAT_LABEL,
@@ -77,10 +83,19 @@ class AgentManager:
         self.register_agent(definition)
 
     def _register_best_flat_floor_agent(self) -> None:
-        """Регистрирует тестового агента для определения лучшего этажа квартиры"""
+        """Регистрирует агента для определения лучшего этажа квартиры"""
         definition = AgentDefinition(
             agent_id=AgentID.BEST_FLAT_FLOOR,
             system_prompt=prompt_manager.SYSTEM_PROMPT_BEST_FLAT_FLOOR,
             response_model=agents_schemas.BestFlatFloorResponse,
+        )
+        self.register_agent(definition)
+
+    def _register_layout_evaluator_agent(self) -> None:
+        """Регистрирует агента для оценки планировки"""
+        definition = AgentDefinition(
+            agent_id=AgentID.LAYOUT_EVALUATOR,
+            system_prompt=prompt_manager.SYSTEM_PROMPT_LAYOUT_EVALUATOR,
+            response_model=agents_schemas.LayoutEvaluatorResponse,
         )
         self.register_agent(definition)
