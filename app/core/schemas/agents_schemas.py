@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 
 class ImageData(BaseModel):
+    layout_type: str
     base64: str
     content_type: str
     file_name: str
@@ -9,7 +10,10 @@ class ImageData(BaseModel):
 
     def to_agent_payload(self) -> list[dict]:
         return [
-            {"type": "text", "text": f"Файл: {self.file_name}, размер: {self.size} байт"},
+            {
+                "type": "text",
+                "text": f"File name: {self.file_name}, size: {self.size}, layout_type: {self.layout_type}",
+            },
             {"type": "image_url", "image_url": {"url": f"data:{self.content_type};base64,{self.base64}"}},
         ]
 
@@ -29,4 +33,4 @@ class BestFlatFloorResponse(BaseModel):
 
 
 class LayoutEvaluatorResponse(BaseModel):
-    layout_score: list[FlatPriorityItem]
+    layout_type: list[FlatPriorityItem]
