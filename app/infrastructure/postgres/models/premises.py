@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from app.infrastructure.postgres.models.base import Base
-from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, func
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -41,5 +41,21 @@ class Premises(Base):
     # Relationships
     real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="premises")
     sales: Mapped[List["Sales"]] = relationship(back_populates="premises")
+
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}
+
+
+class LayoutTypeAttachment(Base):
+    __tablename__ = "layout_type_attachments"
+
+    reo_id: Mapped[int] = mapped_column(Integer, ForeignKey("real_estate_objects.id"), nullable=False)
+    layout_type: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    base64_file: Mapped[str] = mapped_column(Text, nullable=False)
+    content_type: Mapped[str] = mapped_column(String, nullable=False)
+    file_name: Mapped[str] = mapped_column(String, nullable=False)
+    file_size: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Relationships
+    real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="layout_type_attachments")
 
     __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

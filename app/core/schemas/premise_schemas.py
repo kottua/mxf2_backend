@@ -255,3 +255,41 @@ class PremisesFileSpecificationCreate(PremisesFileSpecificationResponse):
 
 class BulkPremisesCreateRequest(BaseModel):
     premises: List[PremisesCreate]
+
+
+class LayoutTypeAttachmentCreate(BaseModel):
+    reo_id: int
+    layout_type: str
+    base64_file: str
+    content_type: str
+    file_name: str
+    file_size: int
+
+    class Config:
+        from_attributes = True
+
+
+class LayoutTypeAttachmentUpdate(BaseModel):
+    layout_type: Optional[str] = None
+    base64_file: Optional[str] = None
+    content_type: Optional[str] = None
+    file_name: Optional[str] = None
+    file_size: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+
+class LayoutTypeAttachmentResponse(BaseModel):
+    id: int
+    reo_id: int
+    layout_type: str
+    base64_file: str
+    content_type: str
+    file_name: str
+    file_size: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
