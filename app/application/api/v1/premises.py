@@ -168,16 +168,12 @@ async def upload_layout_type_attachment(
     return attachment
 
 
-@router.delete("/layout-attachments/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/layout-attachments/{reo_id}/{layout_type}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_layout_attachment(
-    id: int,
+    reo_id: int,
+    layout_type: str,
     attachment_service: layout_type_attachment_service_deps,
     _: current_user_deps,
 ) -> None:
-    """
-    Удаляет вложение планировки.
 
-    Args:
-        id: ID вложения
-    """
-    await attachment_service.delete(id=id)
+    await attachment_service.delete(reo_id=reo_id, layout_type=layout_type)

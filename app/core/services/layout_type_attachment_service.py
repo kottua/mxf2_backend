@@ -59,9 +59,11 @@ class LayoutTypeAttachmentService:
             attachment = await self.repository.create(data.model_dump())
         return LayoutTypeAttachmentResponse.model_validate(attachment)
 
-    async def delete(self, id: int) -> None:
-        attachment = await self.repository.get(id=id)
-        if not attachment:
-            raise ObjectNotFound(model_name="LayoutTypeAttachment", id_=id)
+    async def delete(self, reo_id: int, layout_type: str) -> None:
+        attachment_existing = await self.repository.get_by_reo_id_and_layout_type(
+            reo_id=reo_id, layout_type=layout_type
+        )
+        if not attachment_existing:
+            raise ObjectNotFound(model_name="LayoutTypeAttachment", id_=layout_type)
 
-        await self.repository.delete(attachment=attachment)
+        await self.repository.delete(attachment=attachment_existing)
