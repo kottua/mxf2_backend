@@ -61,13 +61,24 @@ class AgentService:
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
         logger.info(f"Finished running best floor agent for REO ID: {reo_id}")
 
-    async def run_layout_evaluator_agent(self, reo_id: int, user: UserOutputSchema, images: list[ImageData]) -> None:
+    async def run_layout_evaluator_agent(self, reo_id: int, user: UserOutputSchema) -> None:
         logger.info("Running layout evaluator agent")
         reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
 
         user_prompt = prompt_manager.USER_PROMPT_LAYOUT_EVALUATOR.format(
             latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class
         )
+        images: list[ImageData] = []
+
+        for image_attachment in reo.layout_type_attachments:
+            image = ImageData(
+                layout_type=image_attachment.layout_type,
+                base64=image_attachment.base64_file,
+                content_type=image_attachment.content_type,
+                file_name=image_attachment.file_name,
+                size=image_attachment.file_size,
+            )
+            images.append(image)
 
         result_dict = await asyncio.to_thread(
             self._run_blocking_agent, AgentID.LAYOUT_EVALUATOR, user_prompt=user_prompt, images=images

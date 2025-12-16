@@ -1,6 +1,17 @@
-from app.application.api.depends import current_user_deps, file_processing_service_deps, premises_service_deps
+import base64
+
+from app.application.api.depends import (
+    current_user_deps,
+    file_processing_service_deps,
+    layout_type_attachment_service_deps,
+    premises_service_deps,
+    real_estate_object_service_deps,
+)
+from app.core.schemas.agents_schemas import ImageData
 from app.core.schemas.premise_schemas import (
     BulkPremisesCreateRequest,
+    LayoutTypeAttachmentCreate,
+    LayoutTypeAttachmentResponse,
     PremisesCreate,
     PremisesFileSpecificationResponse,
     PremisesResponse,
@@ -114,3 +125,55 @@ async def download_premises_excel_with_actual_price(
             "Content-Disposition": f"attachment; filename=premises_with_actual_price_reo_{reo_id}_dist_{distribution_config_id}.xlsx"
         },
     )
+
+
+async def file_to_image_data(file: UploadFile) -> ImageData:
+    content = await file.read()
+    image_data = ImageData(
+        base64=base64.b64encode(content).decode("utf-8"),
+        content_type=file.content_type,
+        file_name=file.filename,
+        size=file.size,
+    )
+    return image_data
+
+
+@router.post("/layout-attachments/{reo_id}/{layout_type}", response_model=LayoutTypeAttachmentResponse)
+async def upload_layout_type_attachment(
+    reo_id: int,
+    layout_type: str,
+    file: UploadFile,
+    attachment_service: layout_type_attachment_service_deps,
+    real_estate_object_service: real_estate_object_service_deps,
+    current_user: current_user_deps,
+) -> LayoutTypeAttachmentResponse:
+
+    reo = await real_estate_object_service.get_full(id=reo_id, user=current_user)
+
+    file_content = await file.read()
+
+    attachment_data = LayoutTypeAttachmentCreate(
+        reo_id=reo.id,
+        layout_type=layout_type,
+        base64_file=base64.b64encode(file_content).decode("utf-8"),
+        content_type=file.content_type or "image/jpeg",
+        file_name=file.filename or "layout_image",
+        file_size=file.size,
+    )
+
+    attachment = await attachment_service.update_or_create(
+        reo_id=reo_id, layout_type=layout_type, data=attachment_data
+    )
+
+    return attachment
+
+
+@router.delete("/layout-attachments/{reo_id}/{layout_type}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_layout_attachment(
+    reo_id: int,
+    layout_type: str,
+    attachment_service: layout_type_attachment_service_deps,
+    _: current_user_deps,
+) -> None:
+
+    await attachment_service.delete(reo_id=reo_id, layout_type=layout_type)
