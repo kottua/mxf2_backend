@@ -257,9 +257,8 @@ class BulkPremisesCreateRequest(BaseModel):
     premises: List[PremisesCreate]
 
 
-class LayoutTypeAttachmentCreate(BaseModel):
+class AttachmentCreate(BaseModel):
     reo_id: int
-    layout_type: str
     base64_file: str
     content_type: str
     file_name: str
@@ -269,8 +268,21 @@ class LayoutTypeAttachmentCreate(BaseModel):
         from_attributes = True
 
 
-class LayoutTypeAttachmentUpdate(BaseModel):
-    layout_type: Optional[str] = None
+class LayoutTypeAttachmentCreate(AttachmentCreate):
+    layout_type: str
+
+    class Config:
+        from_attributes = True
+
+
+class WindowViewAttachmentCreate(AttachmentCreate):
+    view_from_window: str
+
+    class Config:
+        from_attributes = True
+
+
+class AttachmentUpdate(BaseModel):
     base64_file: Optional[str] = None
     content_type: Optional[str] = None
     file_name: Optional[str] = None
@@ -280,10 +292,17 @@ class LayoutTypeAttachmentUpdate(BaseModel):
         from_attributes = True
 
 
-class LayoutTypeAttachmentResponse(BaseModel):
+class LayoutTypeAttachmentUpdate(AttachmentUpdate):
+    layout_type: Optional[str] = None
+
+
+class WindowViewAttachmentUpdate(AttachmentUpdate):
+    view_from_window: Optional[str] = None
+
+
+class AttachmentResponse(BaseModel):
     id: int
     reo_id: int
-    layout_type: str
     base64_file: str
     content_type: str
     file_name: str
@@ -293,3 +312,11 @@ class LayoutTypeAttachmentResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class LayoutTypeAttachmentResponse(AttachmentResponse):
+    layout_type: str
+
+
+class WindowViewAttachmentResponse(AttachmentResponse):
+    view_from_window: str

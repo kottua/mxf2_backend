@@ -59,3 +59,19 @@ class LayoutTypeAttachment(Base):
     real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="layout_type_attachments")
 
     __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}
+
+
+class WindowViewAttachment(Base):
+    __tablename__ = "window_view_attachments"
+
+    reo_id: Mapped[int] = mapped_column(Integer, ForeignKey("real_estate_objects.id"), nullable=False)
+    view_from_window: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    base64_file: Mapped[str] = mapped_column(Text, nullable=False)
+    content_type: Mapped[str] = mapped_column(String, nullable=False)
+    file_name: Mapped[str] = mapped_column(String, nullable=False)
+    file_size: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Relationships
+    real_estate_object: Mapped["RealEstateObject"] = relationship(back_populates="window_view_attachments")
+
+    __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

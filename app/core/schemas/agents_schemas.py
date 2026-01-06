@@ -3,18 +3,19 @@ import io
 from typing import Any
 
 from openai import OpenAI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, PrivateAttr
 
 
 class FilesData(BaseModel):
-    layout_type: str
+    layout_type: str | None = None
+    view_from_window: str | None = None
     base64: str
     content_type: str
     file_name: str
     size: int
 
-    _file_bytes: bytes = Field(default=None, exclude=True, repr=False)
-    _file_obj: io.BytesIO = Field(default=None, exclude=True, repr=False)
+    _file_bytes: bytes = PrivateAttr()
+    _file_obj: io.BytesIO = PrivateAttr()
 
     def model_post_init(self, context: Any) -> None:
         self._file_bytes = base64.b64decode(self.base64)
@@ -22,12 +23,12 @@ class FilesData(BaseModel):
         self._file_obj.name = self.file_name
 
     def _pdf_payload(self, file_id: str) -> list[dict]:
+        descriptor = self.layout_type or self.view_from_window
+
         return [
             {
                 "type": "text",
-                "text": (
-                    f"PDF file attached: {self.file_name}, " f"size: {self.size}, " f"layout_type: {self.layout_type}"
-                ),
+                "text": (f"PDF file attached: {self.file_name}, " f"size: {self.size}, descriptor: {descriptor}"),
             },
             {
                 "type": "file",
@@ -38,10 +39,11 @@ class FilesData(BaseModel):
         ]
 
     def _image_payload(self) -> list[dict]:
+        descriptor = self.layout_type or self.view_from_window
         return [
             {
                 "type": "text",
-                "text": (f"Image name: {self.file_name}, " f"size: {self.size}, " f"layout_type: {self.layout_type}"),
+                "text": (f"Image name: {self.file_name}, " f"size: {self.size}, descriptor: {descriptor}"),
             },
             {
                 "type": "image_url",
@@ -77,3 +79,7 @@ class BestFlatFloorResponse(BaseModel):
 
 class LayoutEvaluatorResponse(BaseModel):
     layout_type: list[FlatPriorityItem]
+
+
+class WindowViewEvaluatorResponse(BaseModel):
+    view_from_window: list[FlatPriorityItem]

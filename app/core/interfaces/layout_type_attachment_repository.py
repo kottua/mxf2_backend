@@ -2,10 +2,15 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 
-class LayoutTypeAttachmentRepositoryInterface(ABC):
+class PremisesAttachmentRepositoryInterface(ABC):
 
     @abstractmethod
-    async def create(self, data: dict) -> Any:
+    async def create_layout_type(self, data: dict) -> Any:
+        """Create a new layout type attachment record."""
+        raise NotImplementedError
+
+    @abstractmethod
+    async def create_window_view(self, data: dict) -> Any:
         """Create a new layout type attachment record."""
         raise NotImplementedError
 
@@ -17,6 +22,11 @@ class LayoutTypeAttachmentRepositoryInterface(ABC):
     @abstractmethod
     async def get_by_reo_id_and_layout_type(self, reo_id: int, layout_type: str) -> Any:
         """Retrieve a layout type attachment record by reo_id and layout_type."""
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_reo_id_and_window_view(self, reo_id: int, view_from_window: str) -> list[Any]:
+        """Retrieve a window view attachment record by reo_id and view_from_window."""
         raise NotImplementedError
 
     @abstractmethod

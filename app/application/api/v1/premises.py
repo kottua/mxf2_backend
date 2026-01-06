@@ -15,6 +15,8 @@ from app.core.schemas.premise_schemas import (
     PremisesFileSpecificationResponse,
     PremisesResponse,
     PremisesUpdate,
+    WindowViewAttachmentCreate,
+    WindowViewAttachmentResponse,
 )
 from fastapi import APIRouter, UploadFile
 from starlette import status
@@ -149,7 +151,7 @@ async def upload_layout_type_attachment(
         file_size=file.size,
     )
 
-    attachment = await attachment_service.update_or_create(
+    attachment = await attachment_service.update_or_create_layout_type(
         reo_id=reo_id, layout_type=layout_type, data=attachment_data
     )
 
@@ -164,4 +166,45 @@ async def delete_layout_attachment(
     _: current_user_deps,
 ) -> None:
 
-    await attachment_service.delete(reo_id=reo_id, layout_type=layout_type)
+    await attachment_service.delete_layout_type(reo_id=reo_id, layout_type=layout_type)
+
+
+@router.post("/window-view-attachments/{reo_id}/{view_from_window}", response_model=WindowViewAttachmentResponse)
+async def upload_window_view_attachment(
+    reo_id: int,
+    view_from_window: str,
+    file: UploadFile,
+    attachment_service: layout_type_attachment_service_deps,
+    real_estate_object_service: real_estate_object_service_deps,
+    current_user: current_user_deps,
+) -> WindowViewAttachmentResponse:
+
+    reo = await real_estate_object_service.get_full(id=reo_id, user=current_user)
+
+    file_content = await file.read()
+
+    attachment_data = WindowViewAttachmentCreate(
+        reo_id=reo.id,
+        view_from_window=view_from_window,
+        base64_file=base64.b64encode(file_content).decode("utf-8"),
+        content_type=file.content_type or "image/jpeg",
+        file_name=file.filename or "window_view_image",
+        file_size=file.size,
+    )
+
+    attachment = await attachment_service.update_or_create_window_view(
+        reo_id=reo_id, view_from_window=view_from_window, data=attachment_data
+    )
+
+    return attachment
+
+
+@router.delete("/window-view-attachments/{reo_id}/{view_from_window}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_window_view_attachment(
+    reo_id: int,
+    view_from_window: str,
+    attachment_service: layout_type_attachment_service_deps,
+    _: current_user_deps,
+) -> None:
+
+    await attachment_service.delete_view_from_window(reo_id=reo_id, view_from_window=view_from_window)

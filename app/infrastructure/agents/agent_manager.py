@@ -99,3 +99,11 @@ class AgentManager:
             response_model=agents_schemas.LayoutEvaluatorResponse,
         )
         self.register_agent(definition)
+
+    def _register_window_view_evaluator_agent(self) -> None:
+        definition = AgentDefinition(
+            agent_id=AgentID.WINDOW_VIEW_EVALUATOR,
+            system_prompt=prompt_manager.SYSTEM_PROMPT_WINDOW_VIEW_EVALUATOR,
+            response_model=agents_schemas.WindowViewEvaluatorResponse,
+        )
+        self.register_agent(definition)

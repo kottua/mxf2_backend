@@ -1,17 +1,25 @@
 from typing import Sequence
 
-from app.core.interfaces.layout_type_attachment_repository import LayoutTypeAttachmentRepositoryInterface
-from app.infrastructure.postgres.models.premises import LayoutTypeAttachment
+from app.core.interfaces.layout_type_attachment_repository import PremisesAttachmentRepositoryInterface
+from app.infrastructure.postgres.models.premises import LayoutTypeAttachment, WindowViewAttachment
 from app.infrastructure.postgres.session_manager import provide_async_session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-class LayoutTypeAttachmentRepository(LayoutTypeAttachmentRepositoryInterface):
+class PremisesAttachmentRepository(PremisesAttachmentRepositoryInterface):
 
     @provide_async_session
-    async def create(self, data: dict, session: AsyncSession) -> LayoutTypeAttachment:
+    async def create_layout_type(self, data: dict, session: AsyncSession) -> LayoutTypeAttachment:
         attachment = LayoutTypeAttachment(**data)
+        session.add(attachment)
+        await session.commit()
+        await session.refresh(attachment)
+        return attachment
+
+    @provide_async_session
+    async def create_window_view(self, data: dict, session: AsyncSession) -> WindowViewAttachment:
+        attachment = WindowViewAttachment(**data)
         session.add(attachment)
         await session.commit()
         await session.refresh(attachment)
@@ -29,6 +37,17 @@ class LayoutTypeAttachmentRepository(LayoutTypeAttachmentRepositoryInterface):
         result = await session.execute(
             select(LayoutTypeAttachment).where(
                 LayoutTypeAttachment.reo_id == reo_id, LayoutTypeAttachment.layout_type == layout_type
+            )
+        )
+        return result.scalar_one_or_none()
+
+    @provide_async_session
+    async def get_by_reo_id_and_window_view(
+        self, reo_id: int, view_from_window: str, session: AsyncSession
+    ) -> WindowViewAttachment | None:
+        result = await session.execute(
+            select(WindowViewAttachment).where(
+                WindowViewAttachment.reo_id == reo_id, WindowViewAttachment.view_from_window == view_from_window
             )
         )
         return result.scalar_one_or_none()

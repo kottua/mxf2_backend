@@ -48,6 +48,7 @@ class RealEstateObjectRepository(RealEstateObjectRepositoryInterface):
                 selectinload(RealEstateObject.income_plans),
                 selectinload(RealEstateObject.status_mappings),
                 selectinload(RealEstateObject.layout_type_attachments),
+                selectinload(RealEstateObject.window_view_attachments),
             )
         )
         result = await session.execute(stmt)
