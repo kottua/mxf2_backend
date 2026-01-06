@@ -1,7 +1,7 @@
 from typing import Type
 
 import instructor
-from app.core.schemas.agents_schemas import ImageData
+from app.core.schemas.agents_schemas import FilesData
 from app.settings import AgentConfig
 from openai import OpenAI
 from pydantic import BaseModel
@@ -26,10 +26,11 @@ class BaseAgent:
     def system_prompt(self, new_system_prompt: str) -> None:
         self._system_prompt = new_system_prompt
 
-    def run(self, user_input: str, images: list[ImageData] | None = None) -> BaseModel:
+    def run(self, user_input: str, files: list[FilesData] | None = None) -> BaseModel:
         content = [{"type": "text", "text": user_input}]
-        for image in images or []:
-            content.extend(image.to_agent_payload())
+
+        for file in files or []:
+            content.extend(file.upload_and_get_payload(self.client))
 
         messages = [
             {"role": "system", "content": self._system_prompt},

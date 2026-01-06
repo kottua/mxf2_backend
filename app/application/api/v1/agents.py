@@ -5,8 +5,8 @@ from starlette import status
 router = APIRouter()
 
 
-@router.get("/best-flat-label/{reo_id}", status_code=status.HTTP_200_OK)
-async def get_best_flat_label(
+@router.post("/best-flat-label/{reo_id}", status_code=status.HTTP_200_OK)
+async def best_flat_label(
     reo_id: int,
     background_tasks: BackgroundTasks,
     agent_service: agent_service_deps,
@@ -20,8 +20,8 @@ async def get_best_flat_label(
     return {"status": "processing"}
 
 
-@router.get("/best-floor/{reo_id}", status_code=status.HTTP_200_OK)
-async def get_best_floor(
+@router.post("/best-floor/{reo_id}", status_code=status.HTTP_200_OK)
+async def best_floor(
     reo_id: int,
     background_tasks: BackgroundTasks,
     agent_service: agent_service_deps,

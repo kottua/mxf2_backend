@@ -1,7 +1,7 @@
 from typing import Any, Type
 
 from app.core.schemas import agents_schemas
-from app.core.schemas.agents_schemas import ImageData
+from app.core.schemas.agents_schemas import FilesData
 from app.infrastructure.agents.agent_constants import AgentID
 from app.infrastructure.agents.base_agent import BaseAgent
 from app.infrastructure.agents.prompt_manager import prompt_manager
@@ -51,12 +51,12 @@ class AgentManager:
         """Получает агента по ID"""
         return self._agents.get(agent_id)
 
-    def run_agent(self, agent_id: str, user_input: str, images: list[ImageData] | None = None) -> BaseModel | None:
+    def run_agent(self, agent_id: str, user_input: str, files: list[FilesData] | None = None) -> BaseModel | None:
         """Запускает агента с переданным user_input"""
         agent = self.get_agent(agent_id)
         if agent is None:
             return None
-        return agent.run(user_input, images=images)
+        return agent.run(user_input, files=files)
 
     def list_agents(self) -> list[str]:
         """Возвращает список всех зарегистрированных агентов"""

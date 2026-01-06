@@ -1,7 +1,7 @@
 import asyncio
 
 from app.core.exceptions import AgentExecutionError, AgentNotFound
-from app.core.schemas.agents_schemas import ImageData
+from app.core.schemas.agents_schemas import FilesData
 from app.core.schemas.user_schemas import UserOutputSchema
 from app.core.services.pricing_config_service import PricingConfigService
 from app.core.services.real_estate_object_service import RealEstateObjectService
@@ -22,11 +22,11 @@ class AgentService:
         self.real_estate_object_service = real_estate_object_service
         self.pricing_config_service = pricing_config_service
 
-    def _run_blocking_agent(self, agent_id: AgentID, user_prompt: str, images: list[ImageData] | None = None) -> dict:
+    def _run_blocking_agent(self, agent_id: AgentID, user_prompt: str, files: list[FilesData] | None = None) -> dict:
         if self.agent_manager.get_agent(agent_id) is None:
             raise AgentNotFound(agent_id=agent_id)
 
-        result = self.agent_manager.run_agent(agent_id, user_input=user_prompt, images=images)
+        result = self.agent_manager.run_agent(agent_id, user_input=user_prompt, files=files)
 
         if result is None:
             raise AgentExecutionError(agent_id=agent_id)
@@ -68,20 +68,20 @@ class AgentService:
         user_prompt = prompt_manager.USER_PROMPT_LAYOUT_EVALUATOR.format(
             latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class
         )
-        images: list[ImageData] = []
+        files: list[FilesData] = []
 
-        for image_attachment in reo.layout_type_attachments:
-            image = ImageData(
-                layout_type=image_attachment.layout_type,
-                base64=image_attachment.base64_file,
-                content_type=image_attachment.content_type,
-                file_name=image_attachment.file_name,
-                size=image_attachment.file_size,
+        for file_attachment in reo.layout_type_attachments:
+            file = FilesData(
+                layout_type=file_attachment.layout_type,
+                base64=file_attachment.base64_file,
+                content_type=file_attachment.content_type,
+                file_name=file_attachment.file_name,
+                size=file_attachment.file_size,
             )
-            images.append(image)
+            files.append(file)
 
         result_dict = await asyncio.to_thread(
-            self._run_blocking_agent, AgentID.LAYOUT_EVALUATOR, user_prompt=user_prompt, images=images
+            self._run_blocking_agent, AgentID.LAYOUT_EVALUATOR, user_prompt=user_prompt, files=files
         )
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)

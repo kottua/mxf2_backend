@@ -7,7 +7,6 @@ from app.application.api.depends import (
     premises_service_deps,
     real_estate_object_service_deps,
 )
-from app.core.schemas.agents_schemas import ImageData
 from app.core.schemas.premise_schemas import (
     BulkPremisesCreateRequest,
     LayoutTypeAttachmentCreate,
@@ -125,17 +124,6 @@ async def download_premises_excel_with_actual_price(
             "Content-Disposition": f"attachment; filename=premises_with_actual_price_reo_{reo_id}_dist_{distribution_config_id}.xlsx"
         },
     )
-
-
-async def file_to_image_data(file: UploadFile) -> ImageData:
-    content = await file.read()
-    image_data = ImageData(
-        base64=base64.b64encode(content).decode("utf-8"),
-        content_type=file.content_type,
-        file_name=file.filename,
-        size=file.size,
-    )
-    return image_data
 
 
 @router.post("/layout-attachments/{reo_id}/{layout_type}", response_model=LayoutTypeAttachmentResponse)
