@@ -47,3 +47,14 @@ async def translate_images(
     """
     background_tasks.add_task(agent_service.run_layout_evaluator_agent, reo_id=reo_id, user=current_user)
     return {"status": "processing"}
+
+
+@router.post("/window-view-evaluator/{reo_id}", status_code=status.HTTP_200_OK)
+async def window_view_evaluator(
+    reo_id: int, background_tasks: BackgroundTasks, agent_service: agent_service_deps, current_user: current_user_deps
+) -> dict:
+    """
+    Запускает агента для оценки вида из окна
+    """
+    background_tasks.add_task(agent_service.run_window_view_evaluator_agent, reo_id=reo_id, user=current_user)
+    return {"status": "processing"}

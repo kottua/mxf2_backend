@@ -32,5 +32,6 @@ class RealEstateObject(Base):
     income_plans: Mapped[List["IncomePlan"]] = relationship(back_populates="real_estate_object")
     status_mappings: Mapped[List["StatusMapping"]] = relationship(back_populates="real_estate_object")
     layout_type_attachments: Mapped[List["LayoutTypeAttachment"]] = relationship(back_populates="real_estate_object")
+    window_view_attachments: Mapped[List["WindowViewAttachment"]] = relationship(back_populates="real_estate_object")
 
     __table_args__ = {"sqlite_autoincrement": True, "extend_existing": True}

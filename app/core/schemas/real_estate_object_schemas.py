@@ -3,7 +3,11 @@ from typing import Optional
 
 from app.core.schemas import CommittedPricesResponse
 from app.core.schemas.income_plan_schemas import IncomePlanResponse
-from app.core.schemas.premise_schemas import LayoutTypeAttachmentResponse, PremisesResponse
+from app.core.schemas.premise_schemas import (
+    LayoutTypeAttachmentResponse,
+    PremisesResponse,
+    WindowViewAttachmentResponse,
+)
 from app.core.schemas.pricing_config_schemas import PricingConfigResponse
 from app.core.schemas.status_mapping_schemas import StatusMappingResponse
 from app.core.utils.enums import CurrencyEnum, PropertyClassEnum
@@ -73,6 +77,7 @@ class RealEstateObjectFullResponse(BaseModel):
     income_plans: list[IncomePlanResponse]
     status_mappings: list[StatusMappingResponse]
     layout_type_attachments: list[LayoutTypeAttachmentResponse]
+    window_view_attachments: list[WindowViewAttachmentResponse]
 
     class Config:
         from_attributes = True

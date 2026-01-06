@@ -7,7 +7,7 @@ from app.core.services.committed_price_service import CommittedPricesService
 from app.core.services.distribution_config_service import DistributionConfigsService
 from app.core.services.file_processing_service import FileProcessingService
 from app.core.services.income_plan_service import IncomePlanService
-from app.core.services.layout_type_attachment_service import LayoutTypeAttachmentService
+from app.core.services.premises_attachment_service import PremisesAttachmentService
 from app.core.services.premises_service import PremisesService
 from app.core.services.pricing_config_service import PricingConfigService
 from app.core.services.real_estate_object_service import RealEstateObjectService
@@ -20,7 +20,7 @@ from app.infrastructure.excel.excel_processor import ExcelProcessor
 from app.infrastructure.repositories.committed_prices_repository import CommittedPricesRepository
 from app.infrastructure.repositories.distribution_configs_repository import DistributionConfigsRepository
 from app.infrastructure.repositories.income_plans_repository import IncomePlanRepository
-from app.infrastructure.repositories.layout_type_attachment_repository import LayoutTypeAttachmentRepository
+from app.infrastructure.repositories.layout_type_attachment_repository import PremisesAttachmentRepository
 from app.infrastructure.repositories.premises_repository import PremisesRepository
 from app.infrastructure.repositories.pricing_config_repository import PricingConfigRepository
 from app.infrastructure.repositories.real_estate_object_repository import RealEstateObjectRepository
@@ -203,19 +203,17 @@ income_plan_service_deps = Annotated[IncomePlanService, Depends(get_income_plan_
 premises_service_deps = Annotated[PremisesService, Depends(get_premises_service)]
 
 
-def get_layout_type_attachment_repository() -> LayoutTypeAttachmentRepository:
-    return LayoutTypeAttachmentRepository()
+def get_layout_type_attachment_repository() -> PremisesAttachmentRepository:
+    return PremisesAttachmentRepository()
 
 
 def get_layout_type_attachment_service(
-    repository: LayoutTypeAttachmentRepository = Depends(get_layout_type_attachment_repository),
-) -> LayoutTypeAttachmentService:
-    return LayoutTypeAttachmentService(repository=repository)
+    repository: PremisesAttachmentRepository = Depends(get_layout_type_attachment_repository),
+) -> PremisesAttachmentService:
+    return PremisesAttachmentService(repository=repository)
 
 
-layout_type_attachment_service_deps = Annotated[
-    LayoutTypeAttachmentService, Depends(get_layout_type_attachment_service)
-]
+layout_type_attachment_service_deps = Annotated[PremisesAttachmentService, Depends(get_layout_type_attachment_service)]
 status_mapping_service_deps = Annotated[StatusMappingService, Depends(get_status_mapping_service)]
 sales_service_deps = Annotated[SalesService, Depends(get_sales_service)]
 pricing_config_service_deps = Annotated[PricingConfigService, Depends(get_pricing_config_service)]

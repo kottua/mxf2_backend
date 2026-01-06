@@ -86,3 +86,30 @@ class AgentService:
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
         logger.info("Finished running layout evaluator agent")
+
+    async def run_window_view_evaluator_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+        logger.info("Running window view evaluator agent")
+        reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
+
+        user_prompt = prompt_manager.USER_PROMPT_WINDOW_VIEW_EVALUATOR.format(
+            latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class
+        )
+
+        files: list[FilesData] = []
+
+        for file_attachment in reo.window_view_attachments:
+            file = FilesData(
+                view_from_window=file_attachment.view_from_window,
+                base64=file_attachment.base64_file,
+                content_type=file_attachment.content_type,
+                file_name=file_attachment.file_name,
+                size=file_attachment.file_size,
+            )
+            files.append(file)
+
+        result_dict = await asyncio.to_thread(
+            self._run_blocking_agent, AgentID.WINDOW_VIEW_EVALUATOR, user_prompt=user_prompt, files=files
+        )
+
+        await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info("Finished running layout evaluator agent")
