@@ -1,6 +1,8 @@
 from app.core.exceptions import InvalidCredentials, ObjectNotFound
+from app.core.exceptions.domain import ApiKeyAlreadyExists
+from app.core.interfaces.api_repository_repository import ApiRepositoryInterface
 from app.core.interfaces.user_repository import UserRepositoryInterface
-from app.core.schemas.auth_schemas import TokenSchema, TokenType
+from app.core.schemas.auth_schemas import ApiTokenSchema, TokenSchema, TokenType
 from app.core.schemas.user_schemas import UserOutputSchema
 from app.core.utils.security import AuthSecurity
 from app.settings import settings
@@ -8,8 +10,21 @@ from pydantic import EmailStr
 
 
 class AuthService(AuthSecurity):
-    def __init__(self, user_repository: UserRepositoryInterface):
+    def __init__(self, user_repository: UserRepositoryInterface, api_repository: ApiRepositoryInterface):
         self.user_repository: UserRepositoryInterface = user_repository
+        self.api_repository: ApiRepositoryInterface = api_repository
+
+    async def create_api_key(self, payload: ApiTokenSchema, current_user: UserOutputSchema) -> dict:
+        api_exists = await self.api_repository.get_by_user_id(user_id=current_user.id)
+        if api_exists:
+            raise ApiKeyAlreadyExists("API key already exists for this user")
+
+        user = await self.user_repository.get(email=current_user.email)
+
+        api_token = self.generate_api_token(user=current_user)
+        payload = payload.model_dump()
+        payload["key_value"] = api_token.access_token
+        return await self.user_repository.create_api_key(payload=payload, user=user)
 
     async def get_current_user(self, token: str) -> UserOutputSchema:
         verify = self.verify_token(token=token, token_type=TokenType.ACCESS)
@@ -41,6 +56,14 @@ class AuthService(AuthSecurity):
         return TokenSchema(
             access_token=access_token, refresh_token=refresh_token, token_type=settings.token.TOKEN_TYPE
         )
+
+    def generate_api_token(self, user: UserOutputSchema) -> ApiTokenSchema:
+        access_token = self.create_token(
+            payload={"sub": user.email},
+            token_type=TokenType.ACCESS,
+            expire_minutes=settings.token.API_TOKEN_EXPIRE_MINUTES,
+        )
+        return ApiTokenSchema(access_token=access_token)
 
     async def login(self, email: EmailStr, password: str) -> TokenSchema:
         user = await self.user_repository.get(email=email)

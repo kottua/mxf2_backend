@@ -2,7 +2,7 @@ from typing import Dict, Tuple
 from uuid import UUID
 
 from app.core.interfaces.user_repository import UserRepositoryInterface
-from app.infrastructure.postgres.models.users import User
+from app.infrastructure.postgres.models.users import ApiKey, User
 from app.infrastructure.postgres.session_manager import provide_async_session
 from pydantic import EmailStr
 from sqlalchemy import func, select
@@ -62,3 +62,11 @@ class UserRepository(UserRepositoryInterface):
         user = await session.merge(user)
         user.password = new_password
         await session.commit()
+
+    @provide_async_session
+    async def create_api_key(self, payload: dict, user: User, session: AsyncSession) -> ApiKey:
+        api_key = ApiKey(**payload, user=user)
+        session.add(api_key)
+        await session.commit()
+        await session.refresh(api_key)
+        return api_key

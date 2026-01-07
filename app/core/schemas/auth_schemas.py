@@ -24,5 +24,9 @@ class TokenSchema(BaseModel):
     refresh_token: str
 
 
+class ApiTokenSchema(BaseModel):
+    access_token: str
+
+
 class RefreshTokenRequestSchema(BaseModel):
     refresh_token: str

@@ -17,6 +17,7 @@ from app.core.services.status_mapping_service import StatusMappingService
 from app.core.services.user_service import UserService
 from app.infrastructure.agents.agent_manager import AgentManager
 from app.infrastructure.excel.excel_processor import ExcelProcessor
+from app.infrastructure.repositories.api_key_repository import ApiKeyRepository
 from app.infrastructure.repositories.committed_prices_repository import CommittedPricesRepository
 from app.infrastructure.repositories.distribution_configs_repository import DistributionConfigsRepository
 from app.infrastructure.repositories.income_plans_repository import IncomePlanRepository
@@ -42,8 +43,15 @@ def get_user_service(user_repository: UserRepository = Depends(get_user_reposito
     return UserService(user_repository=user_repository)
 
 
-def get_auth_service(user_repository: UserRepository = Depends(get_user_repository)) -> AuthService:
-    return AuthService(user_repository=user_repository)
+def get_api_repository() -> ApiKeyRepository:
+    return ApiKeyRepository()
+
+
+def get_auth_service(
+    user_repository: UserRepository = Depends(get_user_repository),
+    api_repository: ApiKeyRepository = Depends(get_api_repository),
+) -> AuthService:
+    return AuthService(user_repository=user_repository, api_repository=api_repository)
 
 
 auth_service_deps = Annotated[AuthService, Depends(get_auth_service)]

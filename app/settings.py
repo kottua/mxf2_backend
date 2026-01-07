@@ -15,6 +15,9 @@ class TokenSettings(BaseSettings):
     ALGORITHM: str = Field(..., alias="JWT_ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES")
     REFRESH_TOKEN_EXPIRE_MINUTES: int = Field(default=1440, alias="JWT_REFRESH_TOKEN_EXPIRE_MINUTES")
+    API_TOKEN_EXPIRE_MINUTES: int = Field(
+        default=60 * 24 * 365, alias="JWT_API_TOKEN_EXPIRE_MINUTES"  # 60 минут * 24 часа * 365 дней = 1 год
+    )
     TOKEN_TYPE: str = Field(..., alias="JWT_TOKEN_TYPE")
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="JWT_", extra="ignore")
