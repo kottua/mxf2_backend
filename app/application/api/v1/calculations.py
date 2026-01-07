@@ -1,13 +1,8 @@
-import logging
-
 from app.application.api.depends import current_user_deps, scoring_service_deps
 from app.core.schemas.calculation_schemas import RealEstateObjectWithCalculations
 from fastapi import APIRouter
 
 router = APIRouter()
-
-
-logger = logging.getLogger(__name__)
 
 
 @router.get("/scoring/{reo_id}/{distribution_config_id}", response_model=RealEstateObjectWithCalculations)

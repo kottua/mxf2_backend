@@ -85,3 +85,7 @@ class AgentExecutionError(AgentException):
         if reason:
             message += f": {reason}"
         super().__init__(message)
+
+
+class ApiKeyAlreadyExists(ObjectAlreadyExists):
+    pass

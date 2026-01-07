@@ -1,4 +1,5 @@
 from app.application.api.v1.agents import router as agents_router
+from app.application.api.v1.api_key import router as api_router
 from app.application.api.v1.auth import router as auth_router
 from app.application.api.v1.calculations import router as calculations_router
 from app.application.api.v1.committed_prices import router as committed_prices_router
@@ -14,6 +15,7 @@ from fastapi import APIRouter
 
 routers = APIRouter(prefix="/api/v1")
 
+routers.include_router(api_router, prefix="/keys", tags=["API Keys"])
 routers.include_router(auth_router, prefix="/auth", tags=["Auth"])
 routers.include_router(users_router, prefix="/users", tags=["Users"])
 routers.include_router(calculations_router, prefix="/calculate", tags=["Calculations"])

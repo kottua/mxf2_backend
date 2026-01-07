@@ -24,3 +24,7 @@ class UserRepositoryInterface(ABC):
     @abstractmethod
     async def update_password(self, user: Any, new_password: str) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def create_api_key(self, payload: dict, user: Any) -> Any:
+        raise NotImplementedError

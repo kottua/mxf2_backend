@@ -46,3 +46,9 @@ class ResetPasswordSchema(BaseModel):
 
     class Config:
         str_min_length = 1
+
+
+class ApiTokenSchema(BaseModel):
+    """Schema for API token."""
+
+    key_name: str
