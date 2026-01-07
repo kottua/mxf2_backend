@@ -69,3 +69,15 @@ async def total_area_evaluator(
     """
     background_tasks.add_task(agent_service.run_total_area_evaluator_agent, reo_id=reo_id, user=current_user)
     return {"status": "processing"}
+
+
+@router.post("/best-entrance/{reo_id}", status_code=status.HTTP_200_OK)
+async def best_entrance_evaluator(
+    reo_id: int, background_tasks: BackgroundTasks, agent_service: agent_service_deps, current_user: current_user_deps
+) -> dict:
+    """
+    Запускает агента для определения лучшего подъезда и сохраняет результат в PricingConfig
+
+    """
+    background_tasks.add_task(agent_service.run_best_entrance_agent, reo_id=reo_id, user=current_user)
+    return {"status": "processing"}
