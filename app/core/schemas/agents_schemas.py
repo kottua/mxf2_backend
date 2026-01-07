@@ -83,3 +83,7 @@ class LayoutEvaluatorResponse(BaseModel):
 
 class WindowViewEvaluatorResponse(BaseModel):
     view_from_window: list[FlatPriorityItem]
+
+
+class TotalAreaEvaluatorResponse(BaseModel):
+    total_area_m2: list[FlatPriorityItem]

@@ -113,3 +113,18 @@ class AgentService:
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
         logger.info("Finished running layout evaluator agent")
+
+    async def run_total_area_evaluator_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+        logger.info("Running total area evaluator agent")
+        reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
+
+        total_areas = sorted({premise.total_area_m2 for premise in reo.premises})
+        user_prompt = prompt_manager.USER_PROMPT_TOTAL_AREA_EVALUATOR.format(
+            latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class, total_areas=total_areas
+        )
+        result_dict = await asyncio.to_thread(
+            self._run_blocking_agent, AgentID.TOTAL_AREA_EVALUATOR, user_prompt=user_prompt
+        )
+
+        await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info("Finished running total area evaluator agent")
