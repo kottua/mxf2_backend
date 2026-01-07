@@ -58,3 +58,14 @@ async def window_view_evaluator(
     """
     background_tasks.add_task(agent_service.run_window_view_evaluator_agent, reo_id=reo_id, user=current_user)
     return {"status": "processing"}
+
+
+@router.post("/total_area-evaluator/{reo_id}", status_code=status.HTTP_200_OK)
+async def total_area_evaluator(
+    reo_id: int, background_tasks: BackgroundTasks, agent_service: agent_service_deps, current_user: current_user_deps
+) -> dict:
+    """
+    Запускает агента для оценки общей площади
+    """
+    background_tasks.add_task(agent_service.run_total_area_evaluator_agent, reo_id=reo_id, user=current_user)
+    return {"status": "processing"}

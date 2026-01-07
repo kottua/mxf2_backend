@@ -107,3 +107,11 @@ class AgentManager:
             response_model=agents_schemas.WindowViewEvaluatorResponse,
         )
         self.register_agent(definition)
+
+    def _register_total_area_evaluator_agent(self) -> None:
+        definition = AgentDefinition(
+            agent_id=AgentID.TOTAL_AREA_EVALUATOR,
+            system_prompt=prompt_manager.SYSTEM_PROMPT_TOTAL_AREA_EVALUATOR,
+            response_model=agents_schemas.TotalAreaEvaluatorResponse,
+        )
+        self.register_agent(definition)
