@@ -115,3 +115,11 @@ class AgentManager:
             response_model=agents_schemas.TotalAreaEvaluatorResponse,
         )
         self.register_agent(definition)
+
+    def _register_entrance_evaluator_agent(self) -> None:
+        definition = AgentDefinition(
+            agent_id=AgentID.ENTRANCE_EVALUATOR,
+            system_prompt=prompt_manager.SYSTEM_PROMPT_ENTRANCE_EVALUATOR,
+            response_model=agents_schemas.EntranceEvaluatorResponse,
+        )
+        self.register_agent(definition)

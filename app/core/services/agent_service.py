@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 from app.core.exceptions import AgentExecutionError, AgentNotFound
 from app.core.schemas.agents_schemas import FilesData
@@ -128,3 +129,31 @@ class AgentService:
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
         logger.info("Finished running total area evaluator agent")
+
+    async def run_best_entrance_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+        logger.info("Running best entrance agent")
+        reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
+        entrances = set(prem.entrance for prem in reo.premises)
+        entrance_result = []
+        for entrance in entrances:
+            apartments = [p for p in reo.premises if p.entrance == entrance]
+            floors = {p.floor for p in apartments}
+
+            entrance_result.append(
+                {
+                    "entrance_number": entrance,
+                    "apartments_in_entrance": len(apartments),
+                    "floors_in_entrance": len(floors),
+                }
+            )
+
+        entrance_json = json.dumps(entrance_result, ensure_ascii=False)
+        user_prompt = prompt_manager.USER_PROMPT_ENTRANCE_EVALUATOR.format(
+            latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class, entrance_result=entrance_json
+        )
+        result_dict = await asyncio.to_thread(
+            self._run_blocking_agent, AgentID.ENTRANCE_EVALUATOR, user_prompt=user_prompt
+        )
+
+        await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info("Finished running best entrance agent")

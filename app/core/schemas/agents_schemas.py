@@ -87,3 +87,7 @@ class WindowViewEvaluatorResponse(BaseModel):
 
 class TotalAreaEvaluatorResponse(BaseModel):
     total_area_m2: list[FlatPriorityItem]
+
+
+class EntranceEvaluatorResponse(BaseModel):
+    entrance: list[FlatPriorityItem]
