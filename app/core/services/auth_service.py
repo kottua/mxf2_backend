@@ -2,8 +2,8 @@ from app.core.exceptions import InvalidCredentials, ObjectNotFound
 from app.core.exceptions.domain import ApiKeyAlreadyExists
 from app.core.interfaces.api_repository_repository import ApiRepositoryInterface
 from app.core.interfaces.user_repository import UserRepositoryInterface
-from app.core.schemas.auth_schemas import ApiTokenSchema, TokenSchema, TokenType
-from app.core.schemas.user_schemas import UserOutputSchema
+from app.core.schemas.auth_schemas import TokenSchema, TokenType
+from app.core.schemas.user_schemas import ApiTokenInputSchema, ApiTokenOutputSchema, ApiTokenSchema, UserOutputSchema
 from app.core.utils.security import AuthSecurity
 from app.settings import settings
 from pydantic import EmailStr
@@ -14,7 +14,9 @@ class AuthService(AuthSecurity):
         self.user_repository: UserRepositoryInterface = user_repository
         self.api_repository: ApiRepositoryInterface = api_repository
 
-    async def create_api_key(self, payload: ApiTokenSchema, current_user: UserOutputSchema) -> dict:
+    async def create_api_key(
+        self, payload: ApiTokenInputSchema, current_user: UserOutputSchema
+    ) -> ApiTokenOutputSchema:
         api_exists = await self.api_repository.get_by_user_id(user_id=current_user.id)
         if api_exists:
             raise ApiKeyAlreadyExists("API key already exists for this user")
@@ -24,7 +26,8 @@ class AuthService(AuthSecurity):
         api_token = self.generate_api_token(user=current_user)
         payload = payload.model_dump()
         payload["key_value"] = api_token.access_token
-        return await self.user_repository.create_api_key(payload=payload, user=user)
+        api_key = await self.user_repository.create_api_key(payload=payload, user=user)
+        return ApiTokenOutputSchema(access_token=api_key.key_value, key_name=payload.get("key_name"))
 
     async def get_current_user(self, token: str) -> UserOutputSchema:
         verify = self.verify_token(token=token, token_type=TokenType.ACCESS)

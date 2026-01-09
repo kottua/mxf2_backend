@@ -49,6 +49,16 @@ class ResetPasswordSchema(BaseModel):
 
 
 class ApiTokenSchema(BaseModel):
+    access_token: str
+
+
+class ApiTokenInputSchema(BaseModel):
     """Schema for API token."""
 
     key_name: str
+
+
+class ApiTokenOutputSchema(ApiTokenInputSchema, ApiTokenSchema):
+    """Schema for API token."""
+
+    pass
