@@ -91,3 +91,7 @@ class TotalAreaEvaluatorResponse(BaseModel):
 
 class EntranceEvaluatorResponse(BaseModel):
     entrance: list[FlatPriorityItem]
+
+
+class RoomEvaluatorResponse(BaseModel):
+    number_of_rooms: list[FlatPriorityItem]

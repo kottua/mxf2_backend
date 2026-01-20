@@ -157,3 +157,28 @@ class AgentService:
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
         logger.info("Finished running best entrance agent")
+
+    async def run_room_quantity_evaluator_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+        logger.info("Running room quantity agent")
+        reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
+        possible_values = []
+
+        for premise in reo.premises:
+            rooms = premise.number_of_rooms or 0
+            if premise.studio:
+                isolated_bedroom = 0
+            else:
+                isolated_bedroom = rooms
+            possible_values.append(isolated_bedroom)
+
+        unique_values = sorted(set(possible_values))
+
+        user_prompt = prompt_manager.USER_PROMPT_ROOM_QUANTITY_EVALUATOR.format(
+            latitude=reo.lat, longitude=reo.lon, object_class=reo.property_class, isolated_bedroom=unique_values
+        )
+        result_dict = await asyncio.to_thread(
+            self._run_blocking_agent, AgentID.ROOM_EVALUATOR, user_prompt=user_prompt
+        )
+
+        await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info("Finished running best entrance agent")

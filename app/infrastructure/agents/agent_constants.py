@@ -9,3 +9,4 @@ class AgentID(StrEnum):
     WINDOW_VIEW_EVALUATOR = "window_view_evaluator"
     TOTAL_AREA_EVALUATOR = "total_area_evaluator"
     ENTRANCE_EVALUATOR = "entrance_evaluator"
+    ROOM_EVALUATOR = "room_evaluator"

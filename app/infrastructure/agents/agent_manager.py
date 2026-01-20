@@ -123,3 +123,11 @@ class AgentManager:
             response_model=agents_schemas.EntranceEvaluatorResponse,
         )
         self.register_agent(definition)
+
+    def _register_room_evaluator_agent(self) -> None:
+        definition = AgentDefinition(
+            agent_id=AgentID.ROOM_EVALUATOR,
+            system_prompt=prompt_manager.SYSTEM_PROMPT_ROOM_QUANTITY_EVALUATOR,
+            response_model=agents_schemas.RoomEvaluatorResponse,
+        )
+        self.register_agent(definition)
