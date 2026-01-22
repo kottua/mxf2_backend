@@ -81,3 +81,11 @@ async def best_entrance_evaluator(
     """
     background_tasks.add_task(agent_service.run_best_entrance_agent, reo_id=reo_id, user=current_user)
     return {"status": "processing"}
+
+
+@router.post("/room-quantity-evaluator/{reo_id}", status_code=status.HTTP_200_OK)
+async def room_quantity_evaluator(
+    reo_id: int, background_tasks: BackgroundTasks, agent_service: agent_service_deps, current_user: current_user_deps
+) -> dict:
+    background_tasks.add_task(agent_service.run_room_quantity_evaluator_agent, reo_id=reo_id, user=current_user)
+    return {"status": "processing"}
