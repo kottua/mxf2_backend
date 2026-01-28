@@ -10,6 +10,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 class IncomePlanRepository(IncomePlanRepositoryInterface):
 
     @provide_async_session
+    async def get_active_plan_by_reo_id(self, reo_id: int, session: AsyncSession) -> Sequence[IncomePlan] | None:
+        result = await session.execute(
+            select(IncomePlan).where(IncomePlan.reo_id == reo_id, IncomePlan.is_active == True)
+        )
+        plans = result.scalars().all()
+        return plans
+
+    @provide_async_session
     async def create(self, data: dict, session: AsyncSession) -> IncomePlan:
         plan = IncomePlan(**data)
         session.add(plan)

@@ -7,6 +7,10 @@ from app.core.schemas.income_plan_schemas import BulkIncomePlanCreate, IncomePla
 class IncomePlanRepositoryInterface(ABC):
 
     @abstractmethod
+    async def get_active_plan_by_reo_id(self, reo_id: int) -> IncomePlanResponse:
+        raise NotImplementedError
+
+    @abstractmethod
     async def create(self, data: BulkIncomePlanCreate) -> IncomePlanResponse:
         """Create income plans in bulk."""
         raise NotImplementedError

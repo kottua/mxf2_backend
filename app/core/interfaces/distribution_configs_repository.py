@@ -15,6 +15,11 @@ class DistributionConfigsRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_by_name(self, config_name: str, user_id: int) -> dict | None:
+        """Retrieve a distribution configuration by its name."""
+        raise NotImplementedError
+
+    @abstractmethod
     async def update(self, config: Any, data: dict) -> dict | None:
         """Update an existing distribution configuration."""
         raise NotImplementedError

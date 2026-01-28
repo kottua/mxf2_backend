@@ -7,6 +7,10 @@ def handle_object_not_found(_: Request, e: exceptions.ObjectNotFound) -> JSONRes
     return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_404_NOT_FOUND)
 
 
+def handle_income_plan_required(_: Request, e: exceptions.IncomePlanRequiredException) -> JSONResponse:
+    return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
 def handle_object_already_exists(_: Request, e: exceptions.ObjectAlreadyExists) -> JSONResponse:
     return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_409_CONFLICT)
 

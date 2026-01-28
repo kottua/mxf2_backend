@@ -22,6 +22,12 @@ class DistributionConfigsService:
             raise ObjectNotFound(model_name="DistributionConfig", id_=config_id)
         return DistributionConfigResponse.model_validate(distribution_config)
 
+    async def get_by_name(self, config_name: str, user: UserOutputSchema) -> DistributionConfigResponse | None:
+        distribution_config = await self.repository.get_by_name(config_name, user_id=user.id)
+        if not distribution_config:
+            return None
+        return DistributionConfigResponse.model_validate(distribution_config)
+
     async def update(
         self, config_id: int, data: DistributionConfigUpdate, user: UserOutputSchema
     ) -> DistributionConfigResponse:
@@ -42,3 +48,25 @@ class DistributionConfigsService:
     async def get_all(self, user: UserOutputSchema) -> list[DistributionConfigResponse]:
         configs = await self.repository.get_all(user_id=user.id)
         return [DistributionConfigResponse.model_validate(config) for config in configs]
+
+    async def get_or_create_base_config(self, user: UserOutputSchema) -> DistributionConfigResponse:
+        """
+        Получает или создает базовый distribution config с именем "base_config".
+
+        Args:
+            user: Пользователь для создания конфига
+
+        Returns:
+            DistributionConfigResponse: Существующий или созданный distribution config
+        """
+        distribution_config_name = "base_config"
+        distribution_config = await self.get_by_name(config_name=distribution_config_name, user=user)
+
+        if not distribution_config:
+            distribution_config_dto = DistributionConfigCreate(
+                func_name=distribution_config_name,
+                content={"mean1": 0.33, "mean2": 0.67, "stdDev": 0.1, "function_type": "Bimodal"},
+            )
+            distribution_config = await self.create(data=distribution_config_dto, user=user)
+
+        return distribution_config

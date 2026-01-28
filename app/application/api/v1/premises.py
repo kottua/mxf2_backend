@@ -2,9 +2,12 @@ import base64
 
 from app.application.api.depends import (
     current_user_deps,
+    distribution_config_service_deps,
     file_processing_service_deps,
+    income_plan_service_deps,
     layout_type_attachment_service_deps,
     premises_service_deps,
+    pricing_config_service_deps,
     real_estate_object_service_deps,
 )
 from app.core.schemas.premise_schemas import (
@@ -31,28 +34,48 @@ async def upload_premises_specification(
     file: UploadFile,
     file_processing_service: file_processing_service_deps,
     premises_service: premises_service_deps,
+    pricing_config_service: pricing_config_service_deps,
+    income_plan_service: income_plan_service_deps,
+    distribution_config_service: distribution_config_service_deps,
     current_user: current_user_deps,
 ) -> list[PremisesFileSpecificationResponse]:
-    # Read file content
+    # Получаем active_plans, если они есть (если нет - используем пустой список)
+    active_plans = await income_plan_service.get_active_plan_by_reo_id(reo_id=reo_id)
+
+    # Читаем содержимое файла
     file_content = await file.read()
 
-    # Process file using service layer
+    # Обрабатываем файл через сервисный слой
     premises_data = await file_processing_service.process_specification(
         file_content=file_content, filename=file.filename or "unknown"
     )
+
+    # Преобразуем данные в PremisesCreate
     premises_create_list = []
     for spec in premises_data:
         spec_dict = spec.model_dump(by_alias=False)
-        # Convert entrance from int to str
+        # Конвертируем entrance из int в str
         if isinstance(spec_dict.get("entrance"), int):
             spec_dict["entrance"] = str(spec_dict["entrance"])
-        # Add reo_id from endpoint parameter
+        # Добавляем reo_id из параметра endpoint
         spec_dict["reo_id"] = reo_id
 
         premises_create_list.append(PremisesCreate(**spec_dict))
 
+    # Создаем помещения
     bulk_request = BulkPremisesCreateRequest(premises=premises_create_list)
     await premises_service.create_bulk_premises(data=bulk_request, user=current_user)
+
+    # Получаем или создаем базовый distribution config
+    distribution_config = await distribution_config_service.get_or_create_base_config(user=current_user)
+
+    # Синхронизируем pricing config через сервис
+    await pricing_config_service.sync_pricing_config_after_premises_upload(
+        reo_id=reo_id,
+        premises=premises_create_list,
+        active_plans=active_plans,
+        distribution_config=distribution_config,
+    )
 
     return premises_data
 
