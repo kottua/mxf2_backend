@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.post("/upload/{reo_id}", response_model=list[IncomePlanResponse])
-async def upload_premises_specification(
+async def upload_income_plan_specification(
     reo_id: int,
     file: UploadFile,
     file_processing_service: file_processing_service_deps,
@@ -23,18 +23,17 @@ async def upload_premises_specification(
     file_content = await file.read()
 
     # Process file using service layer
-    premises_data = await file_processing_service.process_income_plan(
+    income_plan_data = await file_processing_service.process_income_plan(
         file_content=file_content, filename=file.filename or "unknown"
     )
 
-    premises_create_list: list[IncomePlanCreate] = []
-    for premise in premises_data:
-        premise_dict = premise.model_dump()
+    income_plan_create_list: list[IncomePlanCreate] = []
+    for income_plan in income_plan_data:
+        premise_dict = income_plan.model_dump()
         premise_dict["reo_id"] = reo_id
-        premises_create_list.append(IncomePlanCreate(**premise_dict))
+        income_plan_create_list.append(IncomePlanCreate(**premise_dict))
 
-    bulk_request = BulkIncomePlanCreate(plans=premises_create_list)
-
+    bulk_request = BulkIncomePlanCreate(plans=income_plan_create_list)
     plans = await income_plan_service.create_bulk_income_plans(request=bulk_request, user=current_user)
     return plans
 

@@ -27,6 +27,15 @@ class DistributionConfigsRepository(DistributionConfigsRepositoryInterface):
         return reo
 
     @provide_async_session
+    async def get_by_name(self, config_name: str, user_id: int, session: AsyncSession) -> DistributionConfig | None:
+        stmt = select(DistributionConfig).where(
+            DistributionConfig.func_name == config_name, DistributionConfig.user_id == user_id
+        )
+        result = await session.execute(stmt)
+        reo = result.scalar_one_or_none()
+        return reo
+
+    @provide_async_session
     async def update(self, config: DistributionConfig, data: dict, session: AsyncSession) -> DistributionConfig | None:
         for key, value in data.items():
             if value is not None:

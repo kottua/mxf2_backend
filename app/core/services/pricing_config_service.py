@@ -1,7 +1,11 @@
 import copy
+from datetime import datetime
 
 from app.core.exceptions import ObjectNotFound
 from app.core.interfaces.pricing_config_repository import PricingConfigRepositoryInterface
+from app.core.schemas.distribution_config_schemas import DistributionConfigResponse
+from app.core.schemas.income_plan_schemas import IncomePlanResponse
+from app.core.schemas.premise_schemas import PremisesCreate
 from app.core.schemas.pricing_config_schemas import (
     PricingConfigCreate,
     PricingConfigResponse,
@@ -20,6 +24,12 @@ class PricingConfigService:
         pricing_config = await self.repository.create(data=data.model_dump())
         return PricingConfigResponse.model_validate(pricing_config)
 
+    async def get_active_pricing_config(self, reo_id: int) -> PricingConfigResponse | None:
+        pricing_config = await self.repository.get_by_reo_id(reo_id=reo_id)
+        if not pricing_config:
+            return None
+        return PricingConfigResponse.model_validate(pricing_config)
+
     async def get_pricing_config(self, reo_id: int) -> PricingConfigResponse:
         pricing_config = await self.repository.get_by_reo_id(reo_id=reo_id)
         if not pricing_config:
@@ -31,7 +41,7 @@ class PricingConfigService:
         pricing_configs = await self.repository.get_all()
         return [PricingConfigResponse.model_validate(config) for config in pricing_configs]
 
-    async def update_pricing_config(self, config_id: int, data: PricingConfigCreate) -> PricingConfigResponse:
+    async def update_pricing_config(self, config_id: int, data: PricingConfigUpdate) -> PricingConfigResponse:
         pricing_config = await self.repository.get(config_id=config_id)
         if not pricing_config:
             raise ObjectNotFound(model_name="PricingConfig", id_=config_id)
@@ -108,3 +118,138 @@ class PricingConfigService:
             raise ObjectNotFound(model_name="PricingConfig", id_=config_id)
 
         await self.repository.delete(pricing_config=pricing_config)
+
+    def calculate_current_price_per_sqm(
+        self,
+        all_premises: list[PremisesCreate],
+        available_premises: list[PremisesCreate],
+        active_plans: list[IncomePlanResponse],
+    ) -> float:
+        """
+        Вычисляет current_price_per_sqm.
+
+        Логика:
+        - Если есть active_plans: интерполяция на основе soldout (доли проданных помещений)
+        - Если нет active_plans: средняя цена из available помещений
+
+        Args:
+            all_premises: Все помещения (для расчета soldout)
+            available_premises: Доступные помещения с ценами (для базовой цены)
+            active_plans: Активные планы доходов (опционально)
+
+        Returns:
+            float: Рассчитанная цена за м², округленная до 2 знаков
+        """
+        prices = [p.price_per_meter for p in available_premises if p.price_per_meter]
+        base_price = sum(prices) / len(prices) if prices else 0.0
+
+        sold_count = sum(1 for p in all_premises if p.status == "sold")
+        total_count = len(all_premises)
+        soldout = sold_count / total_count if total_count > 0 else 0.0
+
+        try:
+            sorted_plans = sorted(
+                active_plans,
+                key=lambda x: (
+                    datetime.fromisoformat(x.period_begin.replace("Z", "+00:00"))
+                    if isinstance(x.period_begin, str)
+                    else (x.period_begin if hasattr(x.period_begin, "isoformat") else datetime.min)
+                ),
+            )
+        except (ValueError, AttributeError):
+            sorted_plans = active_plans
+
+        plan_count = len(sorted_plans)
+        calculated_price = base_price
+
+        for i, plan in enumerate(sorted_plans):
+            start = i / plan_count
+            end = (i + 1) / plan_count
+
+            if start <= soldout <= end:
+                price_start = plan.price_per_sqm
+                next_plan = sorted_plans[i + 1] if i + 1 < plan_count else None
+                price_end = next_plan.price_per_sqm if next_plan else price_start
+
+                if end != start:
+                    progress = (soldout - start) / (end - start)
+                else:
+                    progress = 0
+
+                calculated_price = price_start + (price_end - price_start) * progress
+                break
+
+        if calculated_price == base_price and sorted_plans:
+            calculated_price = sorted_plans[0].price_per_sqm
+
+        return round(calculated_price, 2)
+
+    async def sync_pricing_config_after_premises_upload(
+        self,
+        reo_id: int,
+        premises: list[PremisesCreate],
+        active_plans: list[IncomePlanResponse],
+        distribution_config: DistributionConfigResponse,
+    ) -> PricingConfigResponse:
+        available_premises = [
+            p for p in premises if p.status == "available" and p.price_per_meter is not None and p.price_per_meter > 0
+        ]
+        calculated_current_price = self.calculate_current_price_per_sqm(
+            all_premises=premises,
+            available_premises=available_premises,
+            active_plans=active_plans,
+        )
+
+        # Проверяем существование pricing config
+        pricing_config = await self.get_active_pricing_config(reo_id=reo_id)
+
+        if not pricing_config:
+            # Создаем новый pricing config
+            oversold_method = "pieces"
+
+            # Вычисляем min/max цены из available_premises
+            prices = [p.price_per_meter for p in available_premises if p.price_per_meter]
+            minimum_liq_refusal_price = round(min(prices, default=0), 2)
+            maximum_liq_refusal_price = round(max(prices, default=0), 2)
+
+            config = PricingConfigCreate(
+                is_active=True,
+                reo_id=reo_id,
+                content={
+                    "staticConfig": {
+                        "bargainGap": 0,
+                        "maxify_factor": 0,
+                        "current_price_per_sqm": round(calculated_current_price, 2),  # Змінюється кожного разу
+                        "onboarding_current_price_per_sqm": round(
+                            calculated_current_price, 2
+                        ),  # НЕ змінюється кожного разу
+                        "minimum_liq_refusal_price": minimum_liq_refusal_price,  # НЕ змінюється кожного разу
+                        "maximum_liq_refusal_price": maximum_liq_refusal_price,  # НЕ змінюється кожного разу
+                        "overestimate_correct_factor": 0.01,
+                        "oversold_method": oversold_method,
+                        "sigma": 0.1,
+                        "similarityThreshold": 0.1,
+                        "distribConfigId": distribution_config.id,
+                    },
+                    "dynamicConfig": {
+                        "importantFields": {},
+                        "weights": {},
+                    },
+                    "ranging": {},
+                },
+            )
+
+            return await self.create_pricing_config(data=config)
+        else:
+            # Обновляем существующий pricing config
+            existing_content = pricing_config.content or {}
+            static_config = existing_content.get("staticConfig", {})
+            static_config["current_price_per_sqm"] = round(calculated_current_price, 2)
+            existing_content["staticConfig"] = static_config
+
+            upd_config = PricingConfigUpdate(content=existing_content)
+
+            return await self.update_pricing_config(
+                config_id=pricing_config.id,
+                data=upd_config,
+            )

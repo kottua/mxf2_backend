@@ -5,6 +5,7 @@ from app.core.exceptions.domain import (
     DataValidationException,
     FileProcessingException,
     FileReadException,
+    IncomePlanRequiredException,
     InvalidCredentials,
     InvalidFileFormatException,
     MissingRequiredColumnsException,
@@ -26,4 +27,5 @@ __all__ = [
     "AgentException",
     "AgentExecutionError",
     "AgentNotFound",
+    "IncomePlanRequiredException",
 ]

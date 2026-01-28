@@ -26,6 +26,7 @@ def _include_error_handlers(app: FastAPI) -> None:
         exceptions.ObjectAlreadyExists, error_handlers.handle_object_already_exists  # type: ignore
     )
     app.add_exception_handler(exceptions.ObjectNotFound, error_handlers.handle_object_not_found)  # type: ignore
+    app.add_exception_handler(exceptions.IncomePlanRequiredException, error_handlers.handle_income_plan_required)  # type: ignore
     app.add_exception_handler(
         exceptions.InvalidFileFormatException, error_handlers.handle_invalid_file_format  # type: ignore
     )

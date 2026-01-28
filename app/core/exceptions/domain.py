@@ -89,3 +89,8 @@ class AgentExecutionError(AgentException):
 
 class ApiKeyAlreadyExists(ObjectAlreadyExists):
     pass
+
+
+class IncomePlanRequiredException(Exception):
+    def __init__(self, message: str) -> None:
+        super().__init__(message)

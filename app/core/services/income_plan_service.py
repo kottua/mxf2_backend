@@ -1,4 +1,5 @@
 from app.core.exceptions import ObjectNotFound, ValidationException
+from app.core.exceptions.domain import IncomePlanRequiredException
 from app.core.interfaces.income_plans_repository import IncomePlanRepositoryInterface
 from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
 from app.core.schemas.income_plan_schemas import BulkIncomePlanCreate, IncomePlanCreate, IncomePlanResponse
@@ -9,6 +10,15 @@ class IncomePlanService:
     def __init__(self, repository: IncomePlanRepositoryInterface, reo_repository: RealEstateObjectRepositoryInterface):
         self.repository = repository
         self.reo_repository = reo_repository
+
+    async def get_active_plan_by_reo_id(self, reo_id: int) -> list[IncomePlanResponse]:
+        income_plans = await self.repository.get_active_plan_by_reo_id(reo_id=reo_id)
+        if not income_plans:
+            raise IncomePlanRequiredException(
+                "No active income plans found for the specified real estate object. Please upload income plans first."
+            )
+
+        return [IncomePlanResponse.model_validate(plan) for plan in income_plans]
 
     async def create_bulk_income_plans(
         self, request: BulkIncomePlanCreate, user: UserOutputSchema
