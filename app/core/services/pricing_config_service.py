@@ -50,7 +50,50 @@ class PricingConfigService:
         return PricingConfigResponse.model_validate(pricing_config)
 
     async def update_reo_pricing_config(self, reo_id: int, data: dict) -> PricingConfigResponse:
+        is_weighted_factors = "dynamicConfig" in data and isinstance(data.get("dynamicConfig"), dict)
 
+        if is_weighted_factors:
+            return await self._update_reo_pricing_config_weighted_factors(reo_id=reo_id, data=data)
+        return await self._update_reo_pricing_config_ranging(reo_id=reo_id, data=data)
+
+    async def _update_reo_pricing_config_weighted_factors(self, reo_id: int, data: dict) -> PricingConfigResponse:
+        """Обновляет только dynamicConfig.importantFields и dynamicConfig.weights (результат агента weighted factors)."""
+        dconf = data["dynamicConfig"]
+        new_important_fields = dict(dconf.get("importantFields", {}))
+        new_weights = dict(dconf.get("weights", {}))
+
+        pricing_config = await self.repository.get_by_reo_id(reo_id=reo_id)
+        if not pricing_config:
+            content = {
+                "staticConfig": {},
+                "dynamicConfig": {
+                    "importantFields": new_important_fields,
+                    "weights": new_weights,
+                },
+                "ranging": {},
+            }
+            create_data = PricingConfigCreate(
+                is_active=True,
+                reo_id=reo_id,
+                content=content,
+            )
+            pricing_config = await self.repository.create(data=create_data.model_dump())
+        else:
+            content = copy.deepcopy(pricing_config.content)
+            if "dynamicConfig" not in content:
+                content["dynamicConfig"] = {}
+            content["dynamicConfig"]["importantFields"] = new_important_fields
+            content["dynamicConfig"]["weights"] = new_weights
+            if "ranging" not in content:
+                content["ranging"] = {}
+
+            update_data = PricingConfigUpdate(is_active=True, content=content)
+            pricing_config = await self.repository.update(pricing_config, update_data.model_dump())
+
+        return PricingConfigResponse.model_validate(pricing_config)
+
+    async def _update_reo_pricing_config_ranging(self, reo_id: int, data: dict) -> PricingConfigResponse:
+        """Обновляет ranging и при необходимости importantFields/weights для одного поля (результат ranging-агентов)."""
         key = next(iter(data))
         pricing_config = await self.repository.get_by_reo_id(reo_id=reo_id)
         if not pricing_config:
@@ -74,7 +117,7 @@ class PricingConfigService:
                 content["ranging"] = {}
 
             important_fields = content["dynamicConfig"]["importantFields"]
-            if key not in important_fields:
+            if key not in important_fields or not important_fields[key]:
                 important_fields[key] = True
 
             if key not in content["dynamicConfig"]["weights"]:

@@ -131,3 +131,11 @@ class AgentManager:
             response_model=agents_schemas.RoomEvaluatorResponse,
         )
         self.register_agent(definition)
+
+    def _register_weighted_factors_agent(self) -> None:
+        definition = AgentDefinition(
+            agent_id=AgentID.WEIGHTED_FACTORS,
+            system_prompt=prompt_manager.SYSTEM_PROMPT_WEIGHTED_FACTORS_EVALUATOR,
+            response_model=agents_schemas.WeightedFactorsResponse,
+        )
+        self.register_agent(definition)

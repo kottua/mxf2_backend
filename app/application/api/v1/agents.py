@@ -89,3 +89,15 @@ async def room_quantity_evaluator(
 ) -> dict:
     background_tasks.add_task(agent_service.run_room_quantity_evaluator_agent, reo_id=reo_id, user=current_user)
     return {"status": "processing"}
+
+
+@router.post("/weighted-factors/{reo_id}", status_code=status.HTTP_200_OK)
+async def weighted_factors(
+    reo_id: int, background_tasks: BackgroundTasks, agent_service: agent_service_deps, current_user: current_user_deps
+) -> dict:
+    """
+    Запускает агента для определения взвешенных факторов и сохраняет результат в PricingConfig
+
+    """
+    background_tasks.add_task(agent_service.run_weighted_factors_agent, reo_id=reo_id, user=current_user)
+    return {"status": "processing"}
