@@ -1,9 +1,10 @@
 import base64
 import io
-from typing import Any
+from enum import StrEnum
+from typing import Any, Dict
 
 from openai import OpenAI
-from pydantic import BaseModel, PrivateAttr
+from pydantic import BaseModel, Field, PrivateAttr
 
 
 class FilesData(BaseModel):
@@ -95,3 +96,33 @@ class EntranceEvaluatorResponse(BaseModel):
 
 class RoomEvaluatorResponse(BaseModel):
     number_of_rooms: list[FlatPriorityItem]
+
+
+class ValidAgentFields(StrEnum):
+    NUMBER = "number"
+    FLOOR = "floor"
+    LAYOUT_TYPE = "layout_type"
+    VIEW_FROM_WINDOW = "view_from_window"
+    TOTAL_AREA_M2 = "total_area_m2"
+    ENTRANCE = "entrance"
+    NUMBER_OF_ROOMS = "number_of_rooms"
+
+    @classmethod
+    def list_values(cls) -> list[str]:
+        """Повертає список всіх значень: ['number', 'floor', ...]"""
+        return [member.value for member in cls]
+
+    @classmethod
+    def to_prompt_string(cls) -> str:
+        """Повертає рядок для промпту: 'number, floor, layout_type, ...'"""
+        return ", ".join([member.value for member in cls])
+
+
+class DynamicConfig(BaseModel):
+    importantFields: Dict[ValidAgentFields, bool] = Field(..., description="Вказує, чи є поле важливим.")
+
+    weights: Dict[ValidAgentFields, float] = Field(..., description="Ваги факторів. Сума має бути 1.0.")
+
+
+class WeightedFactorsResponse(BaseModel):
+    dynamicConfig: DynamicConfig

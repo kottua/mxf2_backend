@@ -2,7 +2,7 @@ import asyncio
 import json
 
 from app.core.exceptions import AgentExecutionError, AgentNotFound
-from app.core.schemas.agents_schemas import FilesData
+from app.core.schemas.agents_schemas import FilesData, ValidAgentFields
 from app.core.schemas.user_schemas import UserOutputSchema
 from app.core.services.pricing_config_service import PricingConfigService
 from app.core.services.real_estate_object_service import RealEstateObjectService
@@ -182,3 +182,20 @@ class AgentService:
 
         await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
         logger.info("Finished running best entrance agent")
+
+    async def run_weighted_factors_agent(self, reo_id: int, user: UserOutputSchema) -> None:
+        logger.info("Running weighted factors agent")
+        reo = await self.real_estate_object_service.get_full(id=reo_id, user=user)
+
+        user_prompt = prompt_manager.USER_PROMPT_WEIGHTED_FACTORS_EVALUATOR.format(
+            latitude=reo.lat,
+            longitude=reo.lon,
+            object_class=reo.property_class,
+            available_fields_list=ValidAgentFields.to_prompt_string(),
+        )
+        result_dict = await asyncio.to_thread(
+            self._run_blocking_agent, AgentID.WEIGHTED_FACTORS, user_prompt=user_prompt
+        )
+
+        await self.pricing_config_service.update_reo_pricing_config(reo_id=reo_id, data=result_dict)
+        logger.info("Finished running weighted factors agent")

@@ -10,3 +10,4 @@ class AgentID(StrEnum):
     TOTAL_AREA_EVALUATOR = "total_area_evaluator"
     ENTRANCE_EVALUATOR = "entrance_evaluator"
     ROOM_EVALUATOR = "room_evaluator"
+    WEIGHTED_FACTORS = "weighted-factors"
