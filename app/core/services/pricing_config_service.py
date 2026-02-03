@@ -271,7 +271,7 @@ class PricingConfigService:
                         "overestimate_correct_factor": 0.01,
                         "oversold_method": oversold_method,
                         "sigma": 0.1,
-                        "similarityThreshold": 0.1,
+                        "similarityThreshold": 0.01,
                         "distribConfigId": distribution_config.id,
                     },
                     "dynamicConfig": {
