@@ -1,9 +1,11 @@
 from app.core.exceptions import ObjectNotFound, ValidationException
+from app.core.exceptions.domain import DuplicatePremisesIdException
 from app.core.interfaces.premises_repository import PremisesRepositoryInterface
 from app.core.interfaces.real_estate_object_repository import RealEstateObjectRepositoryInterface
 from app.core.schemas.premise_schemas import (
     BulkPremisesCreateRequest,
     PremisesCreate,
+    PremisesFileSpecificationResponse,
     PremisesResponse,
     PremisesUpdate,
 )
@@ -14,6 +16,24 @@ class PremisesService:
     def __init__(self, repository: PremisesRepositoryInterface, reo_repository: RealEstateObjectRepositoryInterface):
         self.repository = repository
         self.reo_repository = reo_repository
+
+    async def check_unique_premises_id(self, premises: list[PremisesFileSpecificationResponse]) -> None:
+        duplicates: set[str] = set()
+        seen: set[str] = set()
+
+        for premise in premises:
+            premises_id = premise.premises_id
+
+            if premises_id is None:
+                continue
+
+            if premises_id in seen:
+                duplicates.add(premises_id)
+            else:
+                seen.add(premises_id)
+
+        if duplicates:
+            raise DuplicatePremisesIdException(premises_ids=sorted(duplicates))
 
     async def create_bulk_premises(
         self, data: BulkPremisesCreateRequest, user: UserOutputSchema

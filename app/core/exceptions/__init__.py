@@ -3,6 +3,7 @@ from app.core.exceptions.domain import (
     AgentExecutionError,
     AgentNotFound,
     DataValidationException,
+    DuplicatePremisesIdException,
     FileProcessingException,
     FileReadException,
     IncomePlanRequiredException,
@@ -28,4 +29,5 @@ __all__ = [
     "AgentExecutionError",
     "AgentNotFound",
     "IncomePlanRequiredException",
+    "DuplicatePremisesIdException",
 ]

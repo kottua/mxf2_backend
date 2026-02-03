@@ -62,6 +62,17 @@ class DataValidationException(FileProcessingException):
         super().__init__(message)
 
 
+class DuplicatePremisesIdException(FileProcessingException):
+    """Raised when duplicate premises_id is found in uploaded file"""
+
+    def __init__(self, premises_ids: list[str]) -> None:
+        self.premises_ids = premises_ids
+
+        message = "Duplicate premises_id found: " + ", ".join(premises_ids)
+
+        super().__init__(message=message)
+
+
 class AgentException(Exception):
     """Base exception for agent-related errors"""
 
