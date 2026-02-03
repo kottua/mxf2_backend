@@ -1,5 +1,6 @@
 from typing import Optional
 
+from app.core.utils.enums import ConfigStatus
 from pydantic import BaseModel
 
 
@@ -7,6 +8,7 @@ class DistributionConfigCreate(BaseModel):
     func_name: str
     content: dict
     is_active: bool = True
+    config_status: ConfigStatus = ConfigStatus.CUSTOM
 
     class Config:
         from_attributes = True
@@ -26,6 +28,7 @@ class DistributionConfigResponse(BaseModel):
     func_name: str
     content: dict
     is_active: bool
+    config_status: ConfigStatus
 
     class Config:
         from_attributes = True

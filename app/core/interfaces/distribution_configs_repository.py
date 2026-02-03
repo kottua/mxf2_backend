@@ -5,7 +5,7 @@ from typing import Any
 class DistributionConfigsRepositoryInterface(ABC):
 
     @abstractmethod
-    async def create(self, data: dict, user_id: int) -> dict:
+    async def create(self, data: dict, user_id: int | None) -> dict:
         """Create a new distribution configuration."""
         raise NotImplementedError
 
@@ -15,7 +15,7 @@ class DistributionConfigsRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_name(self, config_name: str, user_id: int) -> dict | None:
+    async def get_by_name(self, config_name: str) -> dict | None:
         """Retrieve a distribution configuration by its name."""
         raise NotImplementedError
 

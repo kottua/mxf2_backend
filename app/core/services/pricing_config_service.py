@@ -42,7 +42,7 @@ class PricingConfigService:
         return [PricingConfigResponse.model_validate(config) for config in pricing_configs]
 
     async def update_pricing_config(self, config_id: int, data: PricingConfigUpdate) -> PricingConfigResponse:
-        pricing_config = await self.repository.get(config_id=config_id)
+        pricing_config = await self.repository.get(plan_id=config_id)
         if not pricing_config:
             raise ObjectNotFound(model_name="PricingConfig", id_=config_id)
 
@@ -155,10 +155,10 @@ class PricingConfigService:
             "ranging": data,
         }
 
-    async def delete_pricing_config(self, config_id: int) -> None:
-        pricing_config = await self.repository.get(config_id=config_id)
+    async def delete_pricing_config(self, plan_id: int) -> None:
+        pricing_config = await self.repository.get(plan_id=plan_id)
         if not pricing_config:
-            raise ObjectNotFound(model_name="PricingConfig", id_=config_id)
+            raise ObjectNotFound(model_name="PricingConfig", id_=plan_id)
 
         await self.repository.delete(pricing_config=pricing_config)
 
