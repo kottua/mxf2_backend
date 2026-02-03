@@ -6,6 +6,7 @@ from app.core.schemas.distribution_config_schemas import (
     DistributionConfigUpdate,
 )
 from app.core.schemas.user_schemas import UserOutputSchema
+from app.core.utils.enums import ConfigStatus
 
 
 class DistributionConfigsService:
@@ -22,8 +23,17 @@ class DistributionConfigsService:
             raise ObjectNotFound(model_name="DistributionConfig", id_=config_id)
         return DistributionConfigResponse.model_validate(distribution_config)
 
-    async def get_by_name(self, config_name: str, user: UserOutputSchema) -> DistributionConfigResponse | None:
-        distribution_config = await self.repository.get_by_name(config_name, user_id=user.id)
+    async def create_default_config(self, config_name: str) -> DistributionConfigResponse:
+        distribution_config_dto = DistributionConfigCreate(
+            func_name=config_name,
+            content={"mean1": 0.33, "mean2": 0.67, "stdDev": 0.1, "function_type": "Bimodal"},
+            config_status=ConfigStatus.DEFAULT,
+        )
+        distribution_config = await self.repository.create(distribution_config_dto.model_dump(), user_id=None)
+        return DistributionConfigResponse.model_validate(distribution_config)
+
+    async def get_by_name(self, config_name: str) -> DistributionConfigResponse | None:
+        distribution_config = await self.repository.get_by_name(config_name)
         if not distribution_config:
             return None
         return DistributionConfigResponse.model_validate(distribution_config)
@@ -49,7 +59,7 @@ class DistributionConfigsService:
         configs = await self.repository.get_all(user_id=user.id)
         return [DistributionConfigResponse.model_validate(config) for config in configs]
 
-    async def get_or_create_base_config(self, user: UserOutputSchema) -> DistributionConfigResponse:
+    async def get_or_create_base_config(self) -> DistributionConfigResponse:
         """
         Получает или создает базовый distribution config с именем "base_config".
 
@@ -60,13 +70,9 @@ class DistributionConfigsService:
             DistributionConfigResponse: Существующий или созданный distribution config
         """
         distribution_config_name = "base_config"
-        distribution_config = await self.get_by_name(config_name=distribution_config_name, user=user)
+        distribution_config = await self.get_by_name(config_name=distribution_config_name)
 
         if not distribution_config:
-            distribution_config_dto = DistributionConfigCreate(
-                func_name=distribution_config_name,
-                content={"mean1": 0.33, "mean2": 0.67, "stdDev": 0.1, "function_type": "Bimodal"},
-            )
-            distribution_config = await self.create(data=distribution_config_dto, user=user)
+            distribution_config = await self.create_default_config(config_name=distribution_config_name)
 
         return distribution_config

@@ -12,7 +12,7 @@ class PricingConfigRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get(self, config_id: int) -> Any:
+    async def get(self, plan_id: int) -> Any:
         """Retrieve an pricing config by its ID."""
         raise NotImplementedError
 

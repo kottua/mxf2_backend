@@ -42,4 +42,4 @@ async def update_pricing_config(
 async def delete_pricing_config(
     id: int, pricing_config_service: pricing_config_service_deps, _: current_user_deps
 ) -> None:
-    await pricing_config_service.delete_pricing_config(config_id=id)
+    await pricing_config_service.delete_pricing_config(plan_id=id)

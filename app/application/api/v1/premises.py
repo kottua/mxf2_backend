@@ -67,7 +67,7 @@ async def upload_premises_specification(
     await premises_service.create_bulk_premises(data=bulk_request, user=current_user)
 
     # Получаем или создаем базовый distribution config
-    distribution_config = await distribution_config_service.get_or_create_base_config(user=current_user)
+    distribution_config = await distribution_config_service.get_or_create_base_config()
 
     # Синхронизируем pricing config через сервис
     await pricing_config_service.sync_pricing_config_after_premises_upload(

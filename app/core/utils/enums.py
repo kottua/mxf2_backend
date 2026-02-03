@@ -1,6 +1,11 @@
 from enum import StrEnum
 
 
+class ConfigStatus(StrEnum):
+    DEFAULT = "default"
+    CUSTOM = "custom"
+
+
 class PropertyClassEnum(StrEnum):
     ECONOMY = "economy"
     COMFORT = "comfort"
