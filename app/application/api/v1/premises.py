@@ -50,6 +50,8 @@ async def upload_premises_specification(
         file_content=file_content, filename=file.filename or "unknown"
     )
 
+    await premises_service.check_unique_premises_id(premises=premises_data)
+
     # Преобразуем данные в PremisesCreate
     premises_create_list = []
     for spec in premises_data:

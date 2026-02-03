@@ -31,6 +31,10 @@ def handle_data_validation_exception(_: Request, e: exceptions.DataValidationExc
     return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
+def handle_duplicate_premises_exception(_: Request, e: exceptions.DuplicatePremisesIdException) -> JSONResponse:
+    return JSONResponse(content={"message": str(e)}, status_code=status.HTTP_409_CONFLICT)
+
+
 def handle_file_processing_exception(_: Request, e: exceptions.FileProcessingException) -> JSONResponse:
     return JSONResponse(
         content={"message": f"File processing error: {str(e)}"}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR

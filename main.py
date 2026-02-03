@@ -38,6 +38,9 @@ def _include_error_handlers(app: FastAPI) -> None:
         exceptions.DataValidationException, error_handlers.handle_data_validation_exception  # type: ignore
     )
     app.add_exception_handler(
+        exceptions.DuplicatePremisesIdException, error_handlers.handle_duplicate_premises_exception  # type: ignore
+    )
+    app.add_exception_handler(
         exceptions.FileProcessingException, error_handlers.handle_file_processing_exception  # type: ignore
     )
     app.add_exception_handler(exceptions.InvalidCredentials, error_handlers.handle_invalid_credentials)  # type: ignore
