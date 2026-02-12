@@ -21,7 +21,11 @@ class DistributionConfigsRepository(DistributionConfigsRepositoryInterface):
     @provide_async_session
     async def get(self, config_id: int, user_id: int, session: AsyncSession) -> DistributionConfig | None:
         stmt = select(DistributionConfig).where(
-            DistributionConfig.id == config_id, DistributionConfig.user_id == user_id
+            DistributionConfig.id == config_id,
+            or_(
+                (DistributionConfig.user_id == user_id) & (DistributionConfig.config_status == ConfigStatus.CUSTOM),
+                (DistributionConfig.config_status == ConfigStatus.DEFAULT),
+            ),
         )
         result = await session.execute(stmt)
         reo = result.scalar_one_or_none()

@@ -171,9 +171,9 @@ class PremisesFileSpecificationResponse(BaseModel):
     ]
 
     property_type: str = Field(alias="Property type")
-    premises_id: Optional[str] = Field(alias="Premises ID", default=None)
+    premises_id: str | int = Field(alias="Premises ID")
     number_of_unit: int = Field(alias="Number of unit")
-    number: int = Field(alias="Number")
+    number: str | int = Field(alias="Number")
     entrance: int = Field(alias="Entrance")
     floor: int = Field(alias="Floor")
     layout_type: str = Field(alias="Layout type")
