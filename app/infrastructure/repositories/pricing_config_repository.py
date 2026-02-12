@@ -39,7 +39,8 @@ class PricingConfigRepository(PricingConfigRepositoryInterface):
     @provide_async_session
     async def update(self, pricing_config: PricingConfig, data: dict, session: AsyncSession) -> PricingConfig:
         for key, value in data.items():
-            setattr(pricing_config, key, value)
+            if key and value:
+                setattr(pricing_config, key, value)
         session.add(pricing_config)
         await session.commit()
         await session.refresh(pricing_config)
