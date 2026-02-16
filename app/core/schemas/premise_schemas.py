@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 class PremisesCreate(BaseModel):
     reo_id: int
     property_type: str
-    premises_id: str
+    premises_id: str | int
     number_of_unit: int
     number: int
     entrance: str
@@ -36,6 +36,9 @@ class PremisesCreate(BaseModel):
     @model_validator(mode="after")
     def set_defaults_and_calculate_price(self) -> "PremisesCreate":
         """Set default values for None fields and calculate price_per_meter if needed."""
+        if isinstance(self.premises_id, int):
+            self.premises_id = str(self.premises_id)
+
         # Convert None to default values for numeric fields
         if self.price_per_meter is None:
             # Try to calculate from full_price and total_area_m2
